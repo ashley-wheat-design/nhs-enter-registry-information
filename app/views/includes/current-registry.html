@@ -1,0 +1,13 @@
+{% if currentRegistry %}
+  <div class="app-registry-bar" role="region" aria-label="Current registry">
+    <div class="nhsuk-width-container">
+      <div class="app-registry-bar__content">
+        <p class="nhsuk-body-s nhsuk-u-margin-bottom-0">
+          <strong>Current registry:</strong>
+          <span class="app-registry-bar__name">{{ currentRegistry.name }}</span>
+          <a class="nhsuk-link app-registry-bar__change" href="/change-registry">Change</a>
+        </p>
+      </div>
+    </div>
+  </div>
+{% endif %}

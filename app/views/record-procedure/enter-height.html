@@ -1,0 +1,39 @@
+{% extends '../layout.html' %}
+{% set pageName = "Enter height" %}
+{% set currentSection = "record-procedure" %}
+
+{% block beforeContent %}
+<a class="nhsuk-back-link" href="#">
+  Back
+</a>
+{% endblock %}
+
+{% block content %}
+
+<div class="nhsuk-grid-row">
+  <div class="nhsuk-grid-column-two-thirds">
+    <form class="form" action="/record-procedure/enter-height" method="post">
+      <div class="nhsuk-form-group">
+        <fieldset class="nhsuk-fieldset">
+          <legend class="nhsuk-fieldset__legend nhsuk-fieldset__legend--l">
+            <h1 class="nhsuk-fieldset__heading">
+              Enter the patient's height
+            </h1>
+          </legend>
+
+          <div class="nhsuk-input-wrapper">
+            <input class="nhsuk-input nhsuk-input--width-5" id="height" name="height" type="text" spellcheck="false" inputmode="decimal" value="">
+            <div class="nhsuk-input__suffix" aria-hidden="true">cm</div>
+          </div>
+
+        </fieldset>
+      </div>
+
+      <button class="nhsuk-button" data-module="nhsuk-button" type="submit">
+        Continue
+      </button>
+    </form>
+  </div>
+</div>
+
+{% endblock %}

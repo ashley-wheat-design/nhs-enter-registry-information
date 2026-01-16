@@ -1,0 +1,63 @@
+{% extends "../layout.html" %}
+{% set pageName = "Barcode scanner" %}
+
+{% block beforeContent %}
+<a class="nhsuk-back-link" href="#">
+  Back
+</a>
+{% endblock %}
+
+{% block content %}
+
+<form method="post" action="/scanner-answer">
+
+  <div class="nhsuk-form-group">
+    <fieldset class="nhsuk-fieldset">
+      <legend class="nhsuk-fieldset__legend nhsuk-fieldset__legend--l">
+        <h1 class="nhsuk-fieldset__heading">
+          Do you have a barcode scanner?
+        </h1>
+      </legend>
+
+      <div class="nhsuk-hint">
+            If you have a barcode scanner, you can use it to scan the patient’s wristband and device information.
+      </div>
+
+      <div class="nhsuk-radios">
+        <div class="nhsuk-radios__item">
+          <input
+            class="nhsuk-radios__input"
+            id="scanner-yes"
+            name="hasScanner"
+            type="radio"
+            value="yes"
+          >
+          <label class="nhsuk-label nhsuk-radios__label" for="scanner-yes">
+            Yes
+          </label>
+        </div>
+
+        <div class="nhsuk-radios__item">
+          <input
+            class="nhsuk-radios__input"
+            id="scanner-no"
+            name="hasScanner"
+            type="radio"
+            value="no"
+          >
+          <label class="nhsuk-label nhsuk-radios__label" for="scanner-no">
+            No
+          </label>
+        </div>
+      </div>
+
+    </fieldset>
+  </div>
+
+  <button class="nhsuk-button" type="submit">
+    Continue
+  </button>
+
+</form>
+
+{% endblock %}

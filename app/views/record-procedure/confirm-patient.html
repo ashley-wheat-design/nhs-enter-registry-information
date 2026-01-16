@@ -1,0 +1,94 @@
+{% extends '../layout.html' %}
+{% set pageName = "Check patient details" %}
+{% set p = data.selectedPatient %}
+
+{% block beforeContent %}
+<a class="nhsuk-back-link" href="#">
+  Back
+</a>
+{% endblock %}
+
+{% block content %}
+
+<div class="nhsuk-grid-row">
+  <div class="nhsuk-grid-column-two-thirds">
+    <form class="form" action="/record-procedure/confirm-patient" method="post">
+      <div class="nhsuk-form-group">
+        <fieldset class="nhsuk-fieldset">
+          <legend class="nhsuk-fieldset__legend nhsuk-fieldset__legend--l">
+            <h1 class="nhsuk-fieldset__heading">
+              Check {{ p.firstName }} {{ p.lastName }}'s details
+            </h1>
+          </legend>
+
+          <dl class="nhsuk-summary-list">
+
+            <div class="nhsuk-summary-list__row">
+              <dt class="nhsuk-summary-list__key">Name</dt>
+              <dd class="nhsuk-summary-list__value">{{ p.firstName }} {{ p.lastName }}</dd>
+            </div>
+
+            <div class="nhsuk-summary-list__row">
+              <dt class="nhsuk-summary-list__key">Date of birth</dt>
+              <dd class="nhsuk-summary-list__value">{{ p.dob }}</dd>
+            </div>
+
+            <div class="nhsuk-summary-list__row">
+              <dt class="nhsuk-summary-list__key">Address</dt>
+              <dd class="nhsuk-summary-list__value">
+                {{ p.address | join('<br>') | safe }}
+              </dd>
+            </div>
+
+            <div class="nhsuk-summary-list__row">
+              <dt class="nhsuk-summary-list__key">Gender</dt>
+              <dd class="nhsuk-summary-list__value">{{ p.gender }}</dd>
+            </div>
+
+
+            <div class="nhsuk-summary-list__row">
+              <dt class="nhsuk-summary-list__key">NHS number</dt>
+              <dd class="nhsuk-summary-list__value">{{ p.nhsNumber }}</dd>
+            </div>
+
+            <div class="nhsuk-summary-list__row">
+              <dt class="nhsuk-summary-list__key">Registered GP</dt>
+              <dd class="nhsuk-summary-list__value">
+                {{ p.registeredGp | join('<br>') | safe }}
+              </dd>
+            </div>
+
+            <div class="nhsuk-summary-list__row">
+              <dt class="nhsuk-summary-list__key">Height</dt>
+              <dd class="nhsuk-summary-list__value">
+                {% if p.heightCm %}
+                  {{ p.heightCm }} cm
+                {% else %}
+                  <a class="nhsuk-link" href="/record-procedure/enter-height">Enter height</a>
+                {% endif %}
+              </dd>
+            </div>
+
+            <div class="nhsuk-summary-list__row">
+              <dt class="nhsuk-summary-list__key">Weight</dt>
+              <dd class="nhsuk-summary-list__value">
+                {% if p.weightKg %}
+                  {{ p.weightKg }} kg
+                {% else %}
+                  <a class="nhsuk-link" href="/record-procedure/enter-weight">Enter weight</a>
+                {% endif %}
+              </dd>
+            </div>
+
+          </dl>
+        </fieldset>
+      </div>
+
+      <button class="nhsuk-button" data-module="nhsuk-button" type="submit">
+        Continue
+      </button>
+    </form>
+  </div>
+</div>
+
+{% endblock %}

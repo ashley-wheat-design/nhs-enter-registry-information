@@ -2,3 +2,19 @@
 @import "nhsuk-frontend/dist/nhsuk";
 
 // Add your custom CSS/Sass styles below.
+.app-registry-bar {
+  background-color: #fff;
+  border-bottom: 1px solid $nhsuk-border-colour;
+}
+
+.app-registry-bar__content {
+  padding: 16px 0;
+}
+
+.app-registry-bar__name {
+  margin-left: nhsuk-spacing(1);
+}
+
+.app-registry-bar__change {
+  margin-left: nhsuk-spacing(3);
+}

@@ -1,0 +1,31 @@
+{% extends '../layout.html' %}
+{% set pageName = "Start page" %}
+
+{% block beforeContent %}
+<a class="nhsuk-back-link" href="#">
+  Back
+</a>
+{% endblock %}
+
+{% block content %}
+
+<div class="nhsuk-grid-row">
+  <div class="nhsuk-grid-column-two-thirds">
+    <form class="form" action="confirm-patient" method="post">
+      <div class="nhsuk-form-group">
+        <fieldset class="nhsuk-fieldset">
+          <legend class="nhsuk-fieldset__legend nhsuk-fieldset__legend--l">
+            <h1 class="nhsuk-fieldset__heading">
+              Seaerch for the patient
+            </h1>
+          </legend>
+
+        </fieldset>
+      </div>
+      <button class="nhsuk-button" data-module="nhsuk-button" type="submit">
+        Continue
+      </button>
+    </form>
+  </div>
+</div>
+{% endblock %}

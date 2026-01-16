@@ -1,0 +1,76 @@
+{# nhs-number.html #}
+{% extends '../layout.html' %}
+{% set pageName = "Enter NHS number" %}
+{% set shouldAutofocus = data.hasScanner == true %}
+
+{% block beforeContent %}
+<a class="nhsuk-back-link" href="#">
+  Back
+</a>
+{% endblock %}
+
+{% block content %}
+
+<form method="post" action="/record-procedure/nhs-number-answer">
+
+  <div class="nhsuk-grid-row">
+    <div class="nhsuk-grid-column-two-thirds">
+
+      {% if data.nhsNumberError == true %}
+        <div class="nhsuk-error-summary" data-module="nhsuk-error-summary">
+          <div role="alert">
+            <h2 class="nhsuk-error-summary__title">
+              There is a problem
+            </h2>
+            <div class="nhsuk-error-summary__body">
+              <ul class="nhsuk-list nhsuk-error-summary__list">
+                <li>
+                  <a href="#nhs-number">The NHS number is too long</a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+
+      <div class="nhsuk-form-group {% if data.nhsNumberError == true %}nhsuk-form-group--error{% endif %}">
+        <h1 class="nhsuk-label-wrapper">
+          <label class="nhsuk-label nhsuk-label--l" for="nhs-number">
+            Enter the patient's NHS number
+          </label>
+        </h1>
+
+        <div id="nhs-number-hint" class="nhsuk-hint">
+          For example, 485 777 3456
+        </div>
+
+        {% if data.nhsNumberError == true %}
+          <span id="nhs-number-error" class="nhsuk-error-message">
+            <span class="nhsuk-u-visually-hidden">Error:</span>
+            The NHS number is too long
+          </span>
+        {% endif %}
+
+        <input
+          class="nhsuk-input nhsuk-input--width-10 nhsuk-input--code {% if nhsNumberError %}nhsuk-input--error{% endif %}"
+          id="nhs-number"
+          name="nhsNumber"
+          type="text"
+          value="{{ data.nhsNumber }}"
+          spellcheck="false"
+          inputmode="numeric"
+          aria-describedby="nhs-number-hint{% if nhsNumberError %} nhs-number-error{% endif %}"
+          {% if shouldAutofocus %}autofocus{% endif %}
+        >
+      </div>
+
+      <button class="nhsuk-button" data-module="nhsuk-button" type="submit">
+        Continue
+      </button>
+
+    </div>
+  </div>
+
+</form>
+
+{% endblock %}

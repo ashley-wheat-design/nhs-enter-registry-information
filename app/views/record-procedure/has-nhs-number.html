@@ -1,0 +1,46 @@
+{% extends '../layout.html' %}
+{% set pageName = "Start page" %}
+
+{% set currentSection = "record-procedure" %}
+
+{% block beforeContent %}
+<a class="nhsuk-back-link" href="#">
+  Back
+</a>
+{% endblock %}
+
+{% block content %}
+
+<div class="nhsuk-grid-row">
+  <div class="nhsuk-grid-column-two-thirds">
+    <form class="form" action="/record-procedure/nhs-number" method="post">
+      <div class="nhsuk-form-group">
+        <fieldset class="nhsuk-fieldset">
+          <legend class="nhsuk-fieldset__legend nhsuk-fieldset__legend--l">
+            <h1 class="nhsuk-fieldset__heading">
+              Do you have the patient’s NHS number?
+            </h1>
+          </legend>
+          <div class="nhsuk-radios" data-module="nhsuk-radios">
+            <div class="nhsuk-radios__item">
+              <input class="nhsuk-radios__input" id="has-nhs-number-yes" name="hasNHSNumber" type="radio" value="yes">
+              <label class="nhsuk-label nhsuk-radios__label" for="has-nhs-number-yes">
+                Yes
+              </label>
+            </div>
+            <div class="nhsuk-radios__item">
+              <input class="nhsuk-radios__input" id="has-nhs-number-no" name="hasNHSNumber" type="radio" value="no">
+              <label class="nhsuk-label nhsuk-radios__label" for="has-nhs-number-no">
+                No
+              </label>
+            </div>
+          </div>
+        </fieldset>
+      </div>
+      <button class="nhsuk-button" data-module="nhsuk-button" type="submit">
+        Continue
+      </button>
+    </form>
+  </div>
+</div>
+{% endblock %}

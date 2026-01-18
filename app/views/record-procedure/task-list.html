@@ -1,0 +1,73 @@
+{% extends "../layout.html" %}
+{% set pageName = "Barcode scanner" %}
+
+{% block beforeContent %}
+<a class="nhsuk-back-link" href="#">
+  Back
+</a>
+{% endblock %}
+
+{% block content %}
+
+<form method="post" action="/scanner-answer">
+    <div class="nhsuk-grid-row">
+      <div class="nhsuk-grid-column-two-thirds">
+        <h1 class="nhsuk-heading-l">Record a procedure</h1>    
+        <ul class="nhsuk-task-list">
+          <li class="nhsuk-task-list__item nhsuk-task-list__item--with-link">
+            <div class="nhsuk-task-list__name-and-hint">
+              <a class="nhsuk-link nhsuk-task-list__link" href="../record-procedure/patient/has-nhs-number" aria-describedby="your-health-1-status">
+                Patient details
+              </a>
+            </div>
+            {% if data.patientInfoComplete %}
+            <div class="nhsuk-task-list__status nhsuk-task-list__status--completed" id="your-health-1-status">
+              Completed
+            </div>
+            {% else %}
+            <div class="nhsuk-task-list__status" id="your-health-2-status">
+              <strong class="nhsuk-tag nhsuk-tag--blue">
+        Incomplete
+      </strong>
+            </div>
+            {% endif %}
+          </li>
+          <li class="nhsuk-task-list__item nhsuk-task-list__item--with-link">
+            <div class="nhsuk-task-list__name-and-hint">
+              <a class="nhsuk-link nhsuk-task-list__link" href="../record-procedure/procedure/procedure-date" aria-describedby="your-health-2-status">
+                Enter procedure details
+              </a>
+            </div>
+            {% if data.procedureInfoComplete %}
+            <div class="nhsuk-task-list__status nhsuk-task-list__status--completed" id="your-health-1-status">
+              Completed
+            </div>
+            {% else %}
+            <div class="nhsuk-task-list__status" id="your-health-2-status">
+              <strong class="nhsuk-tag nhsuk-tag--blue">
+        Incomplete
+      </strong>
+            </div>
+            {% endif %}
+          </li>
+          <li class="nhsuk-task-list__item nhsuk-task-list__item--with-link">
+            <div class="nhsuk-task-list__name-and-hint">
+              <a class="nhsuk-link nhsuk-task-list__link" href="#" aria-describedby="your-health-3-status">
+                Record device information
+              </a>
+            </div>
+            <div class="nhsuk-task-list__status nhsuk-task-list__status--completed" id="your-health-3-status">
+              Completed
+            </div>
+          </li>
+        </ul>
+
+        <button class="nhsuk-button" data-module="nhsuk-button" type="submit">
+          Finish
+        </button>
+
+      </div>
+    </div>
+</form>
+
+{% endblock %}

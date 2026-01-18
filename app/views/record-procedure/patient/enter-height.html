@@ -1,5 +1,5 @@
-{% extends '../layout.html' %}
-{% set pageName = "Enter weight" %}
+{% extends '../../layout.html' %}
+{% set pageName = "Enter height" %}
 {% set currentSection = "record-procedure" %}
 
 {% block beforeContent %}
@@ -12,18 +12,18 @@
 
 <div class="nhsuk-grid-row">
   <div class="nhsuk-grid-column-two-thirds">
-    <form class="form" action="/record-procedure/enter-weight" method="post">
+    <form class="form" action="/record-procedure/patient/enter-height" method="post">
       <div class="nhsuk-form-group">
         <fieldset class="nhsuk-fieldset">
           <legend class="nhsuk-fieldset__legend nhsuk-fieldset__legend--l">
             <h1 class="nhsuk-fieldset__heading">
-              Enter the patient's weight
+              Enter the patient's height
             </h1>
           </legend>
 
           <div class="nhsuk-input-wrapper">
-            <input class="nhsuk-input nhsuk-input--width-5" id="weight" name="weight" type="text" spellcheck="false" inputmode="decimal" value="">
-            <div class="nhsuk-input__suffix" aria-hidden="true">kg</div>
+            <input class="nhsuk-input nhsuk-input--width-5" id="height" name="height" type="text" spellcheck="false" inputmode="decimal" value="">
+            <div class="nhsuk-input__suffix" aria-hidden="true">cm</div>
           </div>
 
         </fieldset>

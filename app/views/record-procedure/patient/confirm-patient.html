@@ -1,4 +1,4 @@
-{% extends '../layout.html' %}
+{% extends '../../layout.html' %}
 {% set pageName = "Check patient details" %}
 {% set p = data.selectedPatient %}
 
@@ -12,7 +12,7 @@
 
 <div class="nhsuk-grid-row">
   <div class="nhsuk-grid-column-two-thirds">
-    <form class="form" action="/record-procedure/confirm-patient" method="post">
+    <form class="form" action="/record-procedure/patient/patient-information-complete" method="post">
       <div class="nhsuk-form-group">
         <fieldset class="nhsuk-fieldset">
           <legend class="nhsuk-fieldset__legend nhsuk-fieldset__legend--l">
@@ -64,7 +64,7 @@
                 {% if p.heightCm %}
                   {{ p.heightCm }} cm
                 {% else %}
-                  <a class="nhsuk-link" href="/record-procedure/enter-height">Enter height</a>
+                  <a class="nhsuk-link" href="/record-procedure/patient/enter-height">Enter height</a>
                 {% endif %}
               </dd>
             </div>
@@ -75,7 +75,7 @@
                 {% if p.weightKg %}
                   {{ p.weightKg }} kg
                 {% else %}
-                  <a class="nhsuk-link" href="/record-procedure/enter-weight">Enter weight</a>
+                  <a class="nhsuk-link" href="/record-procedure/patient/enter-weight">Enter weight</a>
                 {% endif %}
               </dd>
             </div>

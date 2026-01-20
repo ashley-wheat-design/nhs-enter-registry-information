@@ -18,3 +18,9 @@
 .app-registry-bar__change {
   margin-left: nhsuk-spacing(3);
 }
+
+.nhsuk-radios__label--numbered {
+  display: grid;
+  grid-template-columns: 2ch 1fr;
+  column-gap: 0.5rem;
+}

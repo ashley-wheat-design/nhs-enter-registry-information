@@ -1,0 +1,125 @@
+{% extends '../../layout.html' %}
+{% set pageName = "Check operation details" %}
+{% set currentSection = "record-procedure" %}
+{% set asa = data.currentOperation.asaClassification %}
+
+{% block beforeContent %}
+<a class="nhsuk-back-link" href="javascript:history.back()">Back</a>
+{% endblock %}
+
+{% block content %}
+<div class="nhsuk-grid-row">
+  <div class="nhsuk-grid-column-two-thirds">
+
+    <h1 class="nhsuk-heading-l">Check your answers</h1>
+
+    <dl class="nhsuk-summary-list">
+
+      <div class="nhsuk-summary-list__row">
+        <dt class="nhsuk-summary-list__key">Procedure date</dt>
+        <dd class="nhsuk-summary-list__value">{{ data.procedureDate }}</dd>
+        <dd class="nhsuk-summary-list__actions">
+          <a class="nhsuk-link" href="/record-procedure/procedure/procedure-date">Change</a>
+        </dd>
+      </div>
+
+      <div class="nhsuk-summary-list__row">
+        <dt class="nhsuk-summary-list__key">Procedure time</dt>
+        <dd class="nhsuk-summary-list__value">{{ data.procedureTime }}</dd>
+        <dd class="nhsuk-summary-list__actions">
+          <a class="nhsuk-link" href="/record-procedure/procedure/procedure-time">Change</a>
+        </dd>
+      </div>
+
+      <div class="nhsuk-summary-list__row">
+        <dt class="nhsuk-summary-list__key">Primary diagnosis</dt>
+        <dd class="nhsuk-summary-list__value">
+          {% set primaryCode = data.diagnosisCodes[0] %}
+          {{ primaryCode }} - {{ icd10[primaryCode] }}
+        </dd>
+        <dd class="nhsuk-summary-list__actions">
+          <a class="nhsuk-link" href="/record-procedure/procedure/diagnosis-summary">Change</a>
+        </dd>
+      </div>
+
+      {% if data.diagnosisCodes and data.diagnosisCodes.length > 1 %}
+      <div class="nhsuk-summary-list__row">
+        <dt class="nhsuk-summary-list__key">Additional diagnoses</dt>
+        <dd class="nhsuk-summary-list__value">
+          {% for code in data.diagnosisCodes %}
+
+          {% if not loop.first %}
+          <div class="nhsuk-u-margin-bottom-2">
+            {{ code }}{% if icd10[code] %} - {{ icd10[code] }}{% endif %}
+          </div>
+          {% endif %}
+          {% endfor %}
+        </dd>
+        <dd class="nhsuk-summary-list__actions">
+          <a class="nhsuk-link" href="/record-procedure/procedure/diagnosis-summary">Change</a>
+        </dd>
+      </div>
+      {% endif %}
+
+      <div class="nhsuk-summary-list__row">
+        <dt class="nhsuk-summary-list__key">ASA physical status</dt>
+        <dd class="nhsuk-summary-list__value">
+          {{ asa }} - {{ asaPhysicalStatus[asa] }}
+        </dd>
+        <dd class="nhsuk-summary-list__actions">
+          <a class="nhsuk-link" href="/record-procedure/procedure/physical-status">Change</a>
+        </dd>
+      </div>
+
+      <div class="nhsuk-summary-list__row">
+        <dt class="nhsuk-summary-list__key">Operation outcome</dt>
+        <dd class="nhsuk-summary-list__value">
+          {% if data.currentOperation.operationOutcome == 'implant' %}
+          Implant
+          {% elif data.currentOperation.operationOutcome == 'device-removal' %}
+          Removal of device
+          {% elif data.currentOperation.operationOutcome == 'replacement' %}
+          Replacement (removal and implant)
+          {% elif data.currentOperation.operationOutcome == 'other' %}
+          Other
+          {% if data.currentOperation.operationOutcomeOtherDetail %}
+          <br><span class="nhsuk-hint">{{ data.currentOperation.operationOutcomeOtherDetail }}</span>
+          {% endif %}
+          {% else %}
+          —
+          {% endif %}
+        </dd>
+        <dd class="nhsuk-summary-list__actions">
+          <a class="nhsuk-link" href="/record-procedure/procedure/operation-details">Change</a>
+        </dd>
+      </div>
+
+      <div class="nhsuk-summary-list__row">
+        <dt class="nhsuk-summary-list__key">Anatomical side</dt>
+        <dd class="nhsuk-summary-list__value">
+          {% set lat = data.currentOperation.laterality %}
+          {% if lat == 'L' %}Left
+          {% elif lat == 'R' %}Right
+          {% elif lat == 'B' %}Bilateral
+          {% elif lat == 'M' %}Midline
+          {% elif lat == '8' %}Not applicable
+          {% elif lat == '9' %}Not known
+          {% else %}—
+          {% endif %}
+        </dd>
+        <dd class="nhsuk-summary-list__actions">
+          <a class="nhsuk-link" href="/record-procedure/procedure/operation-details">Change</a>
+        </dd>
+      </div>
+
+    </dl>
+
+    <form action="/record-procedure/procedure/confirm" method="post">
+      <button class="nhsuk-button" data-module="nhsuk-button" type="submit">
+        Confirm and continue
+      </button>
+    </form>
+
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,121 @@
+{% extends '../../layout.html' %}
+{% set pageName = "Add diagnosis" %}
+{% set currentSection = "record-procedure" %}
+
+{% block beforeContent %}
+<a class="nhsuk-back-link" href="javascript:history.back()">Back</a>
+{% endblock %}
+
+{% block content %}
+<div class="nhsuk-grid-row">
+  <div class="nhsuk-grid-column-two-thirds">
+{% if data.addDiagnosisError %}
+  {{ errorSummary({
+    titleText: "There is a problem",
+    errorList: [
+      {
+        text: data.addDiagnosisError,
+        href: "#diagnosisCode-autocomplete"
+      }
+    ]
+  }) }}
+{% endif %}
+
+    <form class="form" action="/record-procedure/procedure/add-diagnosis" method="post">
+
+      <div class="nhsuk-form-group{% if data.addDiagnosisError %} nhsuk-form-group--error{% endif %}">
+        <label class="nhsuk-label nhsuk-label--l" for="diagnosisCode-autocomplete">
+          What is the diagnosis code?
+        </label>
+
+        <div class="nhsuk-hint">
+          Search by diagnosis name or ICD-10 code. For example, "cataract" or "H25.9"
+        </div>
+        {% if data.addDiagnosisError %}
+  <span class="nhsuk-error-message">
+    <span class="nhsuk-u-visually-hidden">Error:</span> {{ data.addDiagnosisError }}
+  </span>
+{% endif %}
+        <div id="diagnosisCode-container"></div>
+
+        <input type="hidden" id="diagnosisCode" name="diagnosisCode" value="">
+      </div>
+
+      <div class="nhsuk-button-group">
+        <button class="nhsuk-button" data-module="nhsuk-button" type="submit">
+          Continue
+        </button>
+
+        <a href="/record-procedure/procedure/diagnosis-summary"
+           class="nhsuk-button nhsuk-button--secondary"
+           role="button"
+           data-module="nhsuk-button">
+          Cancel
+        </a>
+      </div>
+
+    </form>
+
+  </div>
+</div>
+{% endblock %}
+{% block pageScripts %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const container = document.querySelector('#diagnosisCode-container')
+  const hidden = document.querySelector('#diagnosisCode')
+  const form = document.querySelector('form')
+
+  if (!container || !hidden) return
+
+  accessibleAutocomplete({
+    element: container,
+    id: 'diagnosisCode-autocomplete',
+    source: [
+      'H25.9 Senile cataract, unspecified',
+      'H26.9 Cataract, unspecified',
+      'H40.1 Primary open-angle glaucoma',
+      'H40.9 Glaucoma, unspecified',
+      'H33.0 Retinal detachment with retinal break',
+      'M16.9 Osteoarthritis of hip, unspecified',
+      'M17.9 Osteoarthritis of knee, unspecified',
+      'M48.0 Spinal stenosis',
+      'S72.0 Fracture of neck of femur',
+      'M75.1 Rotator cuff syndrome',
+      'I25.1 Atherosclerotic heart disease',
+      'I48.9 Atrial fibrillation and flutter, unspecified',
+      'I10 Essential (primary) hypertension',
+      'I21.9 Acute myocardial infarction, unspecified',
+      'I50.9 Heart failure, unspecified',
+      'K40.9 Inguinal hernia, unspecified',
+      'K80.2 Calculus of gallbladder without cholecystitis',
+      'K35.9 Acute appendicitis, unspecified',
+      'K57.3 Diverticular disease of large intestine without perforation or abscess',
+      'K21.9 Gastro-oesophageal reflux disease without oesophagitis',
+      'N20.0 Calculus of kidney',
+      'N40.0 Benign prostatic hyperplasia',
+      'N39.0 Urinary tract infection, site not specified',
+      'N80.9 Endometriosis, unspecified',
+      'D25.9 Leiomyoma of uterus, unspecified'
+    ],
+    minLength: 2,
+    autoselect: true,
+    confirmOnBlur: true,
+    placeholder: 'Start typing to search',
+    onConfirm: (selected) => {
+      hidden.value = selected ? selected.split(' ')[0] : ''
+    }
+  })
+
+  // Belt-and-braces submit fallback
+  if (form) {
+    form.addEventListener('submit', () => {
+      const input = document.querySelector('#diagnosisCode-autocomplete')
+      if (!hidden.value && input && input.value) {
+        hidden.value = input.value.trim().split(' ')[0]
+      }
+    })
+  }
+})
+</script>
+{% endblock %}

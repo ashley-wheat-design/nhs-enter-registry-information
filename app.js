@@ -191,6 +191,12 @@ app.set('trust proxy', 1)
 // Use public folder for static assets
 app.use(express.static(join(__dirname, 'public')))
 
+// Accessible autocomplete assets
+app.use(
+  '/assets/accessible-autocomplete',
+  express.static(join(__dirname, 'node_modules/accessible-autocomplete/dist'))
+)
+
 // Use assets from NHS frontend
 app.use(
   '/nhsuk-frontend',
@@ -265,8 +271,11 @@ if (
   console.warn('Press `Ctrl+C` and then run `npm run watch` instead')
 }
 
+
+
 module.exports = app
 
 /**
  * @import { ConfigureOptions } from 'nunjucks'
  */
+

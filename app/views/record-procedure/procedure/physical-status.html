@@ -1,0 +1,81 @@
+{% extends '../../layout.html' %}
+{% set pageName = "Physical status" %}
+{% set currentSection = "record-procedure" %}
+
+{% block beforeContent %}
+<a class="nhsuk-back-link" href="javascript:history.back()">Back</a>
+{% endblock %}
+
+{% block content %}
+
+<div class="nhsuk-grid-row">
+  <div class="nhsuk-grid-column-two-thirds">
+    <form class="form" action="/record-procedure/procedure/physical-status" method="post">
+      <div class="nhsuk-form-group">
+        <fieldset class="nhsuk-fieldset" aria-describedby="asa-status-hint">
+          <legend class="nhsuk-fieldset__legend nhsuk-fieldset__legend--l">
+            <h1 class="nhsuk-fieldset__heading">
+              What is the patient's physical status?
+            </h1>
+          </legend>
+
+          <div id="asa-status-hint" class="nhsuk-hint">
+            This is the ASA Physical Status Classification for this procedure.
+          </div>
+
+          <div class="nhsuk-radios" data-module="nhsuk-radios">
+
+            <div class="nhsuk-radios__item">
+              <input class="nhsuk-radios__input" id="asa-1" name="asaClassification" type="radio" value="1">
+              <label class="nhsuk-label nhsuk-radios__label nhsuk-radios__label--numbered" for="asa-1">
+                <span>1.</span><span>A normal healthy patient</span>
+              </label>
+            </div>
+
+            <div class="nhsuk-radios__item">
+              <input class="nhsuk-radios__input" id="asa-2" name="asaClassification" type="radio" value="2">
+              <label class="nhsuk-label nhsuk-radios__label nhsuk-radios__label--numbered" for="asa-2">
+                <span>2.</span><span>A patient with mild systemic disease</span>
+              </label>
+            </div>
+
+            <div class="nhsuk-radios__item">
+              <input class="nhsuk-radios__input" id="asa-3" name="asaClassification" type="radio" value="3">
+              <label class="nhsuk-label nhsuk-radios__label nhsuk-radios__label--numbered" for="asa-3">
+                <span>3.</span><span>A patient with severe systemic disease</span>
+              </label>
+            </div>
+
+            <div class="nhsuk-radios__item">
+              <input class="nhsuk-radios__input" id="asa-4" name="asaClassification" type="radio" value="4">
+              <label class="nhsuk-label nhsuk-radios__label nhsuk-radios__label--numbered" for="asa-4">
+                <span>4.</span><span>A patient with severe systemic disease that is a constant threat to life</span>
+              </label>
+            </div>
+
+            <div class="nhsuk-radios__item">
+              <input class="nhsuk-radios__input" id="asa-5" name="asaClassification" type="radio" value="5">
+              <label class="nhsuk-label nhsuk-radios__label nhsuk-radios__label--numbered" for="asa-5">
+                <span>5.</span><span>A moribund patient who is not expected to survive without the operation</span>
+              </label>
+            </div>
+
+            <div class="nhsuk-radios__item">
+              <input class="nhsuk-radios__input" id="asa-6" name="asaClassification" type="radio" value="6">
+              <label class="nhsuk-label nhsuk-radios__label nhsuk-radios__label--numbered" for="asa-6">
+                <span>6.</span><span>A declared brain-dead patient whose organs are being removed for donor purposes</span>
+              </label>
+            </div>
+
+          </div>
+        </fieldset>
+      </div>
+
+      <button class="nhsuk-button" data-module="nhsuk-button" type="submit">
+        Continue
+      </button>
+    </form>
+  </div>
+</div>
+
+{% endblock %}

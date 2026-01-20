@@ -1,0 +1,88 @@
+{% extends '../../layout.html' %}
+{% set pageName = "Primary diagnosis" %}
+{% set currentSection = "record-procedure" %}
+
+{% block beforeContent %}
+<a class="nhsuk-back-link" href="javascript:history.back()">Back</a>
+{% endblock %}
+
+{% block content %}
+<div class="nhsuk-grid-row">
+  <div class="nhsuk-grid-column-two-thirds">
+    <h1 class="nhsuk-heading-l">What is the primary diagnosis code?</h1>
+    <form class="form" action="/record-procedure/procedure/primary-diagnosis" method="post">
+      <div class="nhsuk-form-group">
+        <div class="nhsuk-hint">
+          Search by diagnosis name or ICD-10 code. For example, "cataract" or "H25.9"
+        </div>
+
+        <div id="primaryDiagnosisCode-container"></div>
+
+        <input type="hidden" id="primaryDiagnosisCode" name="primaryDiagnosisCode" value="">
+      </div>
+
+      <button class="nhsuk-button" data-module="nhsuk-button" type="submit">
+        Continue
+      </button>
+    </form>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block pageScripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const container = document.querySelector('#primaryDiagnosisCode-container')
+    const hidden = document.querySelector('#primaryDiagnosisCode')
+
+    if (!container || !hidden) return
+
+    accessibleAutocomplete({
+      element: container,
+      id: 'primaryDiagnosisCode-autocomplete',
+      source: [
+        'H25.9 Senile cataract, unspecified',
+        'H26.9 Cataract, unspecified',
+        'H40.1 Primary open-angle glaucoma',
+        'H40.9 Glaucoma, unspecified',
+        'H33.0 Retinal detachment with retinal break',
+        'M16.9 Osteoarthritis of hip, unspecified',
+        'M17.9 Osteoarthritis of knee, unspecified',
+        'M48.0 Spinal stenosis',
+        'S72.0 Fracture of neck of femur',
+        'M75.1 Rotator cuff syndrome',
+        'I25.1 Atherosclerotic heart disease',
+        'I48.9 Atrial fibrillation and flutter, unspecified',
+        'I10 Essential (primary) hypertension',
+        'I21.9 Acute myocardial infarction, unspecified',
+        'I50.9 Heart failure, unspecified',
+        'K40.9 Inguinal hernia, unspecified',
+        'K80.2 Calculus of gallbladder without cholecystitis',
+        'K35.9 Acute appendicitis, unspecified',
+        'K57.3 Diverticular disease of large intestine without perforation or abscess',
+        'K21.9 Gastro-oesophageal reflux disease without oesophagitis',
+        'N20.0 Calculus of kidney',
+        'N40.0 Benign prostatic hyperplasia',
+        'N39.0 Urinary tract infection, site not specified',
+        'N80.9 Endometriosis, unspecified',
+        'D25.9 Leiomyoma of uterus, unspecified'
+      ],
+      minLength: 2,
+      autoselect: true,
+      confirmOnBlur: false,
+      placeholder: 'Start typing to search',
+      onConfirm: (selected) => {
+        // selected is the chosen string, e.g. "H25.9 Senile cataract, unspecified"
+        if (!selected) {
+          hidden.value = ''
+          return
+        }
+
+        // store just the code (before the first space)
+        hidden.value = selected.split(' ')[0]
+      }
+    })
+  })
+</script>
+{% endblock %}

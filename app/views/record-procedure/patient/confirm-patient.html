@@ -41,6 +41,17 @@
             </div>
 
             <div class="nhsuk-summary-list__row">
+              <dt class="nhsuk-summary-list__key">Email address</dt>
+              <dd class="nhsuk-summary-list__value">
+                {% if p.emailAddress %}
+                  {{ p.emailAddress }}
+                {% else %}
+                  <a class="nhsuk-link" href="/record-procedure/patient/enter-email">Enter email address</a>
+                {% endif %}
+              </dd>
+            </div>
+
+            <div class="nhsuk-summary-list__row">
               <dt class="nhsuk-summary-list__key">Gender</dt>
               <dd class="nhsuk-summary-list__value">{{ p.gender }}</dd>
             </div>
@@ -85,7 +96,7 @@
       </div>
 
       <button class="nhsuk-button" data-module="nhsuk-button" type="submit">
-        Continue
+        Confirm and continue
       </button>
     </form>
   </div>

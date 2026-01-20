@@ -1,0 +1,73 @@
+{% extends '../../layout.html' %}
+{% set pageName = "Diagnoses" %}
+{% set currentSection = "record-procedure" %}
+
+{% block beforeContent %}
+<a class="nhsuk-back-link" href="javascript:history.back()">Back</a>
+{% endblock %}
+
+{% block content %}
+<div class="nhsuk-grid-row">
+  <div class="nhsuk-grid-column-three-quarters">
+
+    <h1 class="nhsuk-heading-l">Diagnoses</h1>
+
+    <form class="form" action="/record-procedure/procedure/physical-status" method="post">
+
+      
+
+        {% if data.diagnosisCodes and data.diagnosisCodes.length %}
+<dl class="nhsuk-summary-list nhsuk-summary-list--no-border">
+          <h2 class="nhsuk-heading-m">Primary diagnosis</h2>
+          <div class="nhsuk-summary-list__row">
+              <dd class="nhsuk-summary-list__value">
+          <p class="nhsuk-body">{{ data.diagnosisCodes[0] }} - {{ icd10[data.diagnosisCodes[0]] }}</p>
+          </dd>
+          <dd class="nhsuk-summary-list__actions">
+                <a class="nhsuk-link" href="/record-procedure/procedure/add-diagnosis">
+                  Change
+                </a>
+              </dd>
+          </div>
+        </dl>
+        {% endif %}
+
+        {% if data.diagnosisCodes and data.diagnosisCodes.length > 1 %}
+        <h2 class="nhsuk-heading-m">Additional diagnoses</h2>
+        <dl class="nhsuk-summary-list">
+          {% for code in data.diagnosisCodes %}
+            {% if not loop.first %}
+            <div class="nhsuk-summary-list__row">
+              <dd class="nhsuk-summary-list__value">
+                {{ code }} - {{ icd10[code] }}
+              </dd>
+              <dd class="nhsuk-summary-list__actions">
+                <a class="nhsuk-link" href="/record-procedure/procedure/add-diagnosis">
+                  Change
+                </a>
+              </dd>
+            </div>
+            {% endif %}
+          {% endfor %}
+        {% endif %}
+
+      </dl>
+
+      <div class="nhsuk-button-group">
+        <button class="nhsuk-button" data-module="nhsuk-button" type="submit">
+          Continue
+        </button>
+
+        <a href="/record-procedure/procedure/add-diagnosis"
+           class="nhsuk-button nhsuk-button--secondary"
+           role="button"
+           data-module="nhsuk-button">
+          Add another diagnosis
+        </a>
+      </div>
+
+    </form>
+
+  </div>
+</div>
+{% endblock %}

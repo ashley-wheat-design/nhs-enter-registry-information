@@ -1,0 +1,133 @@
+{% extends '../../layout.html' %}
+{% set pageName = "Operation details" %}
+{% set currentSection = "record-procedure" %}
+
+{% block beforeContent %}
+<a class="nhsuk-back-link" href="javascript:history.back()">Back</a>
+{% endblock %}
+
+{% block content %}
+<div class="nhsuk-grid-row">
+  <div class="nhsuk-grid-column-two-thirds">
+
+    <form class="form" action="/record-procedure/procedure/operation-details" method="post">
+
+      {# Operation outcome #}
+      <div class="nhsuk-form-group">
+        <fieldset class="nhsuk-fieldset" aria-describedby="operation-outcome-hint">
+          <legend class="nhsuk-fieldset__legend nhsuk-fieldset__legend--l">
+            <h1 class="nhsuk-fieldset__heading">
+              Operation details
+            </h1>
+          </legend>
+
+          <h2 class="nhsuk-heading-m">Operation outcome</h2>
+
+          <div id="operation-outcome-hint" class="nhsuk-hint">
+            Select the option that best describes what happened to the device during this operation.
+          </div>
+
+          <div class="nhsuk-radios" data-module="nhsuk-radios">
+            <div class="nhsuk-radios__item">
+              <input class="nhsuk-radios__input" id="operationOutcome-implant" name="operationOutcome" type="radio" value="implant">
+              <label class="nhsuk-label nhsuk-radios__label" for="operationOutcome-implant">
+                Implant
+              </label>
+            </div>
+
+            <div class="nhsuk-radios__item">
+              <input class="nhsuk-radios__input" id="operationOutcome-removal" name="operationOutcome" type="radio" value="device-removal">
+              <label class="nhsuk-label nhsuk-radios__label" for="operationOutcome-removal">
+                Removal of device
+              </label>
+            </div>
+
+            <div class="nhsuk-radios__item">
+              <input class="nhsuk-radios__input" id="operationOutcome-replacement" name="operationOutcome" type="radio" value="replacement">
+              <label class="nhsuk-label nhsuk-radios__label" for="operationOutcome-replacement">
+                Replacement (removal and implant)
+              </label>
+            </div>
+
+            <div class="nhsuk-radios__item">
+              <input
+                class="nhsuk-radios__input"
+                id="operationOutcome-other"
+                name="operationOutcome"
+                type="radio"
+                value="other"
+                aria-controls="conditional-operationOutcome-other"
+                aria-expanded="false">
+              <label class="nhsuk-label nhsuk-radios__label" for="operationOutcome-other">
+                Other
+              </label>
+            </div>
+
+            <div class="nhsuk-radios__conditional nhsuk-radios__conditional--hidden" id="conditional-operationOutcome-other">
+              <div class="nhsuk-form-group">
+                <label class="nhsuk-label" for="operationOutcomeOtherDetail">
+                  Provide details (optional)
+                </label>
+                <input class="nhsuk-input nhsuk-u-width-two-thirds" id="operationOutcomeOtherDetail" name="operationOutcomeOtherDetail" type="text">
+              </div>
+            </div>
+          </div>
+        </fieldset>
+      </div>
+
+      {# Anatomical side #}
+      <div class="nhsuk-form-group">
+        <fieldset class="nhsuk-fieldset" aria-describedby="laterality-hint">
+          <legend class="nhsuk-fieldset__legend nhsuk-fieldset__legend--m">
+            <h2 class="nhsuk-fieldset__heading">
+              Anatomical side
+            </h2>
+          </legend>
+
+          <div id="laterality-hint" class="nhsuk-hint">
+            Select the side of the body from the patient’s perspective.
+          </div>
+
+          <div class="nhsuk-radios" data-module="nhsuk-radios">
+            <div class="nhsuk-radios__item">
+              <input class="nhsuk-radios__input" id="laterality-left" name="laterality" type="radio" value="L">
+              <label class="nhsuk-label nhsuk-radios__label" for="laterality-left">Left</label>
+            </div>
+
+            <div class="nhsuk-radios__item">
+              <input class="nhsuk-radios__input" id="laterality-right" name="laterality" type="radio" value="R">
+              <label class="nhsuk-label nhsuk-radios__label" for="laterality-right">Right</label>
+            </div>
+
+            <div class="nhsuk-radios__item">
+              <input class="nhsuk-radios__input" id="laterality-bilateral" name="laterality" type="radio" value="B">
+              <label class="nhsuk-label nhsuk-radios__label" for="laterality-bilateral">Bilateral</label>
+            </div>
+
+            <div class="nhsuk-radios__item">
+              <input class="nhsuk-radios__input" id="laterality-midline" name="laterality" type="radio" value="M">
+              <label class="nhsuk-label nhsuk-radios__label" for="laterality-midline">Midline</label>
+            </div>
+
+            <div class="nhsuk-radios__item">
+              <input class="nhsuk-radios__input" id="laterality-not-known" name="laterality" type="radio" value="9">
+              <label class="nhsuk-label nhsuk-radios__label" for="laterality-not-known">Not known</label>
+            </div>
+
+            {# Optional, if you want it #}
+            <div class="nhsuk-radios__item">
+              <input class="nhsuk-radios__input" id="laterality-not-applicable" name="laterality" type="radio" value="8">
+              <label class="nhsuk-label nhsuk-radios__label" for="laterality-not-applicable">Not applicable</label>
+            </div>
+          </div>
+        </fieldset>
+      </div>
+
+      <button class="nhsuk-button" data-module="nhsuk-button" type="submit">
+        Continue
+      </button>
+
+    </form>
+  </div>
+</div>
+{% endblock %}

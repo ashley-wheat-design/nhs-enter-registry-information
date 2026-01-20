@@ -16,7 +16,7 @@
         <ul class="nhsuk-task-list">
           <li class="nhsuk-task-list__item nhsuk-task-list__item--with-link">
             <div class="nhsuk-task-list__name-and-hint">
-              <a class="nhsuk-link nhsuk-task-list__link" href="../record-procedure/patient/has-nhs-number" aria-describedby="your-health-1-status">
+              <a class="nhsuk-link nhsuk-task-list__link" href="{% if data.patientInfoComplete %}../record-procedure/patient/confirm-patient{% else %}../record-procedure/patient/has-nhs-number{% endif %}" aria-describedby="your-health-1-status">
                 Patient details
               </a>
             </div>
@@ -38,7 +38,25 @@
                 Enter procedure details
               </a>
             </div>
-            {% if data.procedureInfoComplete %}
+            {% if data.procedureDetailsComplete  %}
+            <div class="nhsuk-task-list__status nhsuk-task-list__status--completed" id="your-health-1-status">
+              Completed
+            </div>
+            {% else %}
+            <div class="nhsuk-task-list__status" id="your-health-2-status">
+              <strong class="nhsuk-tag nhsuk-tag--blue">
+        Incomplete
+      </strong>
+            </div>
+            {% endif %}
+          </li>
+          <li class="nhsuk-task-list__item nhsuk-task-list__item--with-link">
+            <div class="nhsuk-task-list__name-and-hint">
+              <a class="nhsuk-link nhsuk-task-list__link" href="../record-procedure/clinician/responsible-consultant" aria-describedby="your-health-2-status">
+                Enter clinician details
+              </a>
+            </div>
+            {% if data.clinicianDetailsComplete %}
             <div class="nhsuk-task-list__status nhsuk-task-list__status--completed" id="your-health-1-status">
               Completed
             </div>
@@ -56,9 +74,17 @@
                 Record device information
               </a>
             </div>
-            <div class="nhsuk-task-list__status nhsuk-task-list__status--completed" id="your-health-3-status">
+            {% if data.clinicianDetailsComplete %}
+            <div class="nhsuk-task-list__status nhsuk-task-list__status--completed" id="your-health-1-status">
               Completed
             </div>
+            {% else %}
+            <div class="nhsuk-task-list__status" id="your-health-2-status">
+              <strong class="nhsuk-tag nhsuk-tag--blue">
+        Incomplete
+      </strong>
+            </div>
+            {% endif %}
           </li>
         </ul>
 

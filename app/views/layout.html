@@ -8,8 +8,10 @@
 {% extends "prototype-kit-template.njk" %}
 
 {% block head %}
+<link rel="stylesheet" href="/assets/accessible-autocomplete/accessible-autocomplete.min.css">
   <!-- Add your custom CSS or Sass in /app/assets/sass/main.scss -->
   <link href="/css/main.css" rel="stylesheet">
+  <script src="/assets/accessible-autocomplete/accessible-autocomplete.min.js"></script>
 {% endblock %}
 
 <!-- Edit the header -->
@@ -55,3 +57,5 @@
     {% block pageScripts %}{% endblock %}
   {% endblock %}
 {% endblock %}
+
+

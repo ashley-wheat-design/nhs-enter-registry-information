@@ -1,0 +1,41 @@
+{% extends '../../layout.html' %}
+{% set pageName = "Procedure date" %}
+{% set currentSection = "record-procedure" %}
+
+{% block beforeContent %}
+<a class="nhsuk-back-link" href="#">
+  Back
+</a>
+{% endblock %}
+
+{% block content %}
+
+<div class="nhsuk-grid-row">
+  <div class="nhsuk-grid-column-two-thirds">
+    <form class="form" action="/record-procedure/procedure/procedure-time" method="post">
+      <div class="nhsuk-form-group">
+        <fieldset class="nhsuk-fieldset">
+          <legend class="nhsuk-fieldset__legend nhsuk-fieldset__legend--l">
+            <h1 class="nhsuk-fieldset__heading">
+              Enter the procedure time
+            </h1>
+          </legend>
+
+          <div class="nhsuk-form-group">
+            <div id="example-with-hint-text-hint" class="nhsuk-hint">
+              Use a 24 hour format (HHMM)
+            </div>
+            <input class="nhsuk-input nhsuk-u-width-one-quarter" id="one-quarter" name="procedureTime" type="text">
+          </div>
+
+        </fieldset>
+      </div>
+
+      <button class="nhsuk-button" data-module="nhsuk-button" type="submit">
+        Continue
+      </button>
+    </form>
+  </div>
+</div>
+
+{% endblock %}

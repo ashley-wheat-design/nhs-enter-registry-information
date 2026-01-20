@@ -2,7 +2,8 @@ const express = require('express')
 const router = express.Router()
 const icd10 = require('./data/icd10')
 const asaPhysicalStatus = require('./data/asa-physical-status')
-
+const { clinicians, findClinicianByGmc } = require('./data/clinicians')
+const { devices, findDeviceByUdi } = require('./data/devices')
 
 router.use((req, res, next) => {
   req.session.data ||= {}
@@ -27,6 +28,9 @@ router.use((req, res, next) => {
 
   req.session.data.currentRegistry = { id: 'mdor', name: 'Medical Devices Outcomes Registry (MDOR)' }
 
+  req.session.data.clinicians = clinicians
+  req.session.data.devicesCatalogue = devices
+
   res.locals.data = req.session.data
   res.locals.currentUser = req.session.data.currentUser
   res.locals.currentOrganisation = req.session.data.currentOrganisation
@@ -35,10 +39,10 @@ router.use((req, res, next) => {
   res.locals.icd10 = icd10
   res.locals.asaPhysicalStatus = asaPhysicalStatus
 
-
   next()
 })
 
+/* Start */
 router.get('/record-procedure', (req, res) => {
   delete req.session.data.nhsNumber
   delete req.session.data.selectedPatient
@@ -50,6 +54,7 @@ router.post('/scanner-answer', (req, res) => {
   res.redirect('record-procedure/task-list')
 })
 
+/* Patient */
 router.get('/record-procedure/patient/has-nhs-number', (req, res) => {
   res.render('record-procedure/patient/has-nhs-number')
 })
@@ -59,7 +64,7 @@ router.post('/has-nhs-number-answer', (req, res) => {
   return res.redirect('/record-procedure/patient/patient-search')
 })
 
-router.get('/nhs-number', (req, res) => {
+router.get('/record-procedure/patient/nhs-number', (req, res) => {
   res.render('record-procedure/patient/nhs-number')
 })
 
@@ -80,7 +85,7 @@ router.post('/nhs-number-answer', (req, res) => {
   const patient = patients.find(p => p.nhsNumber === nhsNumber)
 
   if (!patient) {
-    return res.redirect('/record-procedure/patient-search')
+    return res.redirect('/record-procedure/patient/patient-search')
   }
 
   req.session.data.selectedPatient = patient
@@ -98,7 +103,7 @@ router.post('/record-procedure/patient/patient-information-complete', (req, res)
 })
 
 router.get('/record-procedure/patient/enter-weight', (req, res) => {
-  if (!req.session.data.selectedPatient) return res.redirect('/record-procedure/nhs-number')
+  if (!req.session.data.selectedPatient) return res.redirect('/record-procedure/patient/nhs-number')
   res.render('record-procedure/patient/enter-weight')
 })
 
@@ -142,6 +147,7 @@ router.post('/record-procedure/patient/enter-email', (req, res) => {
   res.redirect('/record-procedure/patient/confirm-patient')
 })
 
+/* Procedure */
 router.post('/record-procedure/procedure/procedure-date', (req, res) => {
   const procedureDateToday = req.body.procedureDateToday
 
@@ -180,14 +186,11 @@ router.post('/record-procedure/procedure/procedure-date', (req, res) => {
 })
 
 router.post('/record-procedure/procedure/procedure-time', (req, res) => {
-    let procedureTime = (req.body.procedureTime || '').trim()
+  let procedureTime = (req.body.procedureTime || '').trim()
 
-  // Remove spaces
   procedureTime = procedureTime.replace(/\s+/g, '')
 
-  // If user didn't include a colon
   if (!procedureTime.includes(':')) {
-    // e.g. 930 or 0930 → 09:30
     if (procedureTime.length === 3) {
       procedureTime = `0${procedureTime[0]}:${procedureTime.slice(1)}`
     } else if (procedureTime.length === 4) {
@@ -205,7 +208,6 @@ router.post('/record-procedure/procedure/primary-diagnosis', (req, res) => {
 
   if (!req.session.data.diagnosisCodes) req.session.data.diagnosisCodes = []
 
-  // Prevent duplicates
   if (code && !req.session.data.diagnosisCodes.includes(code)) {
     req.session.data.diagnosisCodes.push(code)
   }
@@ -216,7 +218,6 @@ router.post('/record-procedure/procedure/primary-diagnosis', (req, res) => {
 router.get('/record-procedure/procedure/add-diagnosis', (req, res) => {
   res.render('record-procedure/procedure/add-diagnosis')
 })
-
 
 router.post('/record-procedure/procedure/add-diagnosis', (req, res) => {
   const code = req.body.diagnosisCode
@@ -242,19 +243,16 @@ router.post('/record-procedure/procedure/add-diagnosis', (req, res) => {
 router.post('/record-procedure/procedure/physical-status', (req, res) => {
   const asa = req.body.asaClassification
 
-  // Basic validation
   if (!asa) {
     req.session.data.asaClassificationError = 'Select the patient’s physical status'
     return res.redirect('/record-procedure/procedure/physical-status')
   }
 
-  // Store on the current operation
   req.session.data.currentOperation ||= {}
   req.session.data.currentOperation.asaClassification = asa
 
   delete req.session.data.asaClassificationError
 
-  // Next step: operation details (implant / explant + laterality)
   return res.redirect('/record-procedure/procedure/operation-details')
 })
 
@@ -272,7 +270,6 @@ router.get('/record-procedure/procedure/operation-summary', (req, res) => {
   res.render('record-procedure/procedure/operation-summary')
 })
 
-
 router.post('/record-procedure/procedure/confirm', (req, res) => {
   const patient = req.session.data.selectedPatient
   if (!patient) {
@@ -287,42 +284,231 @@ router.post('/record-procedure/procedure/confirm', (req, res) => {
   const newProcedure = {
     id: `proc-${Date.now()}`,
     recordedAt: new Date().toISOString(),
-
-    // These are stored at top-level in your journey
     date: req.session.data.procedureDate || null,
     time: req.session.data.procedureTime || null,
-
     primaryDiagnosisCode: diagnosisCodes[0] || null,
     additionalDiagnosisCodes: diagnosisCodes.slice(1),
-
-    // These are stored under currentOperation in your journey
     asaClassification: op.asaClassification || null,
     operationOutcome: op.operationOutcome || null,
     operationOutcomeOtherDetail: op.operationOutcomeOtherDetail || '',
     laterality: op.laterality || null,
-
     clinicians: {
-      leadSurgeon: req.session.data.leadSurgeonName || null
+      responsibleConsultant: req.session.data.responsibleConsultant || null,
+      supervisingSurgeon: req.session.data.supervisingSurgeon || null,
+      leadSurgeons: req.session.data.leadSurgeons || []
     },
-
-    devices: []
+    devices: req.session.data.currentOperationDevices || []
   }
 
   patient.procedures.push(newProcedure)
-
-  console.log('✅ New procedure saved:', newProcedure)
-  console.log('✅ Patient now has procedures:', patient.procedures.length)
 
   delete req.session.data.currentOperation
   delete req.session.data.diagnosisCodes
   delete req.session.data.procedureDate
   delete req.session.data.procedureTime
-  
+  delete req.session.data.currentOperationDevices
+
   req.session.data.procedureDetailsComplete = true
-  
+
   return res.redirect('/record-procedure/task-list')
 })
 
+/* Clinicians */
+router.get('/record-procedure/clinician/responsible-consultant', (req, res) => {
+  res.render('record-procedure/clinician/responsible-consultant')
+})
 
+router.post('/record-procedure/clinician/responsible-consultant', (req, res) => {
+  const gmc = (req.session.data.responsibleConsultantGmc || '').trim()
+  req.session.data.responsibleConsultant = findClinicianByGmc(gmc)
+
+  if (!req.session.data.responsibleConsultant) {
+    req.session.data.clinicianLookupError = 'We could not find a clinician with that GMC number'
+    return res.redirect('/record-procedure/clinician/responsible-consultant')
+  }
+
+  delete req.session.data.clinicianLookupError
+  return res.redirect('/record-procedure/clinician/confirm-responsible-consultant')
+})
+
+router.get('/record-procedure/clinician/confirm-responsible-consultant', (req, res) => {
+  res.render('record-procedure/clinician/confirm-responsible-consultant')
+})
+
+router.post('/record-procedure/clinician/confirm-responsible-consultant', (req, res) => {
+  res.redirect('/record-procedure/clinician/supervising-surgeon')
+})
+
+router.get('/record-procedure/clinician/supervising-surgeon', (req, res) => {
+  res.render('record-procedure/clinician/supervising-surgeon')
+})
+
+router.post('/record-procedure/clinician/supervising-surgeon', (req, res) => {
+  const gmc = (req.session.data.supervisingSurgeonGmc || '').trim()
+  req.session.data.supervisingSurgeon = findClinicianByGmc(gmc)
+
+  if (!req.session.data.supervisingSurgeon) {
+    req.session.data.clinicianLookupError = 'We could not find a clinician with that GMC number'
+    return res.redirect('/record-procedure/clinician/supervising-surgeon')
+  }
+
+  delete req.session.data.clinicianLookupError
+  return res.redirect('/record-procedure/clinician/confirm-supervising-surgeon')
+})
+
+router.get('/record-procedure/clinician/confirm-supervising-surgeon', (req, res) => {
+  res.render('record-procedure/clinician/confirm-supervising-surgeon')
+})
+
+router.post('/record-procedure/clinician/confirm-supervising-surgeon', (req, res) => {
+  res.redirect('/record-procedure/clinician/operation-lead-surgeon')
+})
+
+router.get('/record-procedure/clinician/operation-lead-surgeon', (req, res) => {
+  req.session.data.leadSurgeons ||= []
+  res.render('record-procedure/clinician/operation-lead-surgeon')
+})
+
+router.post('/record-procedure/clinician/operation-lead-surgeon', (req, res) => {
+  const gmc = (req.session.data.leadSurgeonGmc || '').trim()
+  req.session.data.leadSurgeon = findClinicianByGmc(gmc)
+
+  if (!req.session.data.leadSurgeon) {
+    req.session.data.clinicianLookupError = 'We could not find a clinician with that GMC number'
+    return res.redirect('/record-procedure/clinician/operation-lead-surgeon')
+  }
+
+  delete req.session.data.clinicianLookupError
+  return res.redirect('/record-procedure/clinician/confirm-operation-lead-surgeon')
+})
+
+router.get('/record-procedure/clinician/confirm-operation-lead-surgeon', (req, res) => {
+  req.session.data.leadSurgeons ||= []
+  res.render('record-procedure/clinician/confirm-operation-lead-surgeon')
+})
+
+router.post('/record-procedure/clinician/confirm-operation-lead-surgeon', (req, res) => {
+  req.session.data.leadSurgeons ||= []
+
+  if (req.session.data.leadSurgeon && req.session.data.leadSurgeons.length < 4) {
+    req.session.data.leadSurgeons.push(req.session.data.leadSurgeon)
+  }
+
+  req.session.data.leadSurgeonGmc = ''
+  req.session.data.leadSurgeon = null
+
+  return res.redirect('/record-procedure/clinician/clinicians-summary')
+})
+
+router.get('/record-procedure/clinician/clinicians-summary', (req, res) => {
+  req.session.data.leadSurgeons ||= []
+  res.render('record-procedure/clinician/clinicians-summary')
+})
+
+router.post('/record-procedure/clinician/clinicians-summary', (req, res) => {
+  req.session.data.clinicianDetailsComplete = true
+  return res.redirect('/record-procedure/task-list')
+})
+
+router.get('/record-procedure/clinician/add-another-operation-lead-surgeon', (req, res) => {
+  return res.redirect('/record-procedure/clinician/clinicians-summary')
+})
+
+router.post('/record-procedure/clinician/add-another-operation-lead-surgeon', (req, res) => {
+  return res.redirect('/record-procedure/clinician/clinicians-summary')
+})
+
+/* Devices */
+router.get('/record-procedure/devices/add-devices', (req, res) => {
+  req.session.data.currentOperationDevices ||= []
+  res.render('record-procedure/devices/add-devices')
+})
+
+router.post('/record-procedure/devices/add-devices/add', (req, res) => {
+  req.session.data.currentOperationDevices ||= []
+
+  if (req.session.data.hasScanner) {
+    return res.redirect('/record-procedure/devices/scan-device')
+  }
+
+  return res.redirect('/record-procedure/devices/select-device')
+})
+
+router.get('/record-procedure/devices/scan-device', (req, res) => {
+  req.session.data.scannedUdi = ''
+  req.session.data.deviceToConfirm = null
+  res.render('record-procedure/devices/scan-device')
+})
+
+router.post('/record-procedure/devices/scan-device', (req, res) => {
+  const scanned = (req.body.scannedUdi || '').trim()
+  req.session.data.scannedUdi = scanned
+
+  const found = findDeviceByUdi(scanned)
+  req.session.data.deviceToConfirm = found
+
+  if (!found) {
+    req.session.data.deviceScanError = 'We could not find a device for that barcode'
+    return res.redirect('/record-procedure/devices/scan-device')
+  }
+
+  delete req.session.data.deviceScanError
+  return res.redirect('/record-procedure/devices/confirm-device')
+})
+
+router.get('/record-procedure/devices/confirm-device', (req, res) => {
+  if (!req.session.data.deviceToConfirm) {
+    return res.redirect('/record-procedure/devices/add-devices')
+  }
+
+  res.render('record-procedure/devices/confirm-device')
+})
+
+router.post('/record-procedure/devices/confirm-device', (req, res) => {
+  req.session.data.currentOperationDevices ||= []
+
+  const device = req.session.data.deviceToConfirm
+
+  if (device) {
+    const alreadyAdded = req.session.data.currentOperationDevices.some(
+      d => d.uniqueDeviceIdentifier === device.uniqueDeviceIdentifier
+    )
+
+    if (!alreadyAdded) {
+      req.session.data.currentOperationDevices.push(device)
+    }
+  }
+
+  req.session.data.deviceToConfirm = null
+  req.session.data.scannedUdi = ''
+
+  return res.redirect('/record-procedure/devices/add-devices')
+})
+
+router.get('/record-procedure/devices/select-device', (req, res) => {
+  req.session.data.deviceToConfirm = null
+  res.render('record-procedure/devices/select-device')
+})
+
+router.post('/record-procedure/devices/select-device', (req, res) => {
+  const selectedUdi = (req.body.selectedUdi || '').trim()
+  const found = findDeviceByUdi(selectedUdi)
+  req.session.data.deviceToConfirm = found
+
+  if (!found) {
+    req.session.data.deviceSelectError = 'Select a device'
+    return res.redirect('/record-procedure/devices/select-device')
+  }
+
+  delete req.session.data.deviceSelectError
+  return res.redirect('/record-procedure/devices/confirm-device')
+})
+
+router.post('/record-procedure/devices/add-devices', (req, res) => {
+  
+  req.session.data.deviceDetailsComplete = true
+
+  return res.redirect('/record-procedure/task-list')
+})
 
 module.exports = router

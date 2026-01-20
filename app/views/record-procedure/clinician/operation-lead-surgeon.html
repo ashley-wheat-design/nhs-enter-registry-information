@@ -1,0 +1,51 @@
+{% extends '../../layout.html' %}
+{% set pageName = "Operation lead surgeon" %}
+{% set currentSection = "record-procedure" %}
+
+{% block beforeContent %}
+<a class="nhsuk-back-link" href="javascript:history.back()">Back</a>
+{% endblock %}
+
+{% block content %}
+<div class="nhsuk-grid-row">
+  <div class="nhsuk-grid-column-two-thirds">
+
+    <form class="form" action="/record-procedure/clinician/operation-lead-surgeon" method="post">
+      <h1 class="nhsuk-heading-l">Who is the operation lead surgeon?</h1>
+
+        <div class="nhsuk-inset-text">
+            <p class="body">You can add up to 4 operation lead surgeons.</p>
+        </div>
+
+      <div class="nhsuk-form-group">
+        <label class="nhsuk-label" for="lead-surgeon-gmc">GMC number</label>
+        <div class="nhsuk-hint" id="lead-surgeon-gmc-hint">For example, 1234567</div>
+
+        <input
+          class="nhsuk-input nhsuk-input--width-10"
+          id="lead-surgeon-gmc"
+          name="leadSurgeonGmc"
+          type="text"
+          inputmode="numeric"
+          autocomplete="off"
+          aria-describedby="lead-surgeon-gmc-hint"
+          value="{{ data.leadSurgeonGmc }}"
+        >
+      </div>
+
+      <button class="nhsuk-button" data-module="nhsuk-button" type="submit">Continue</button>
+    </form>
+
+    {% if data.leadSurgeons and data.leadSurgeons.length %}
+      <hr class="nhsuk-section-break nhsuk-section-break--m nhsuk-section-break--visible">
+      <h2 class="nhsuk-heading-m">Lead surgeons added</h2>
+      <ul class="nhsuk-list nhsuk-list--bullet">
+        {% for s in data.leadSurgeons %}
+          <li>GMC {{ s.gmc }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+
+  </div>
+</div>
+{% endblock %}

@@ -1,5 +1,5 @@
 {% extends '../../layout.html' %}
-{% set pageName = "Operation responsible consultant" %}
+{% set pageName = "Operation supervising surgeon" %}
 {% set currentSection = "record-procedure" %}
 
 {% block beforeContent %}
@@ -10,25 +10,25 @@
 <div class="nhsuk-grid-row">
   <div class="nhsuk-grid-column-two-thirds">
 
-    <form class="form" action="/record-procedure/clinician/responsible-consultant" method="post">
+    <form class="form" action="/record-procedure/clinician/supervising-surgeon" method="post">
       <div class="nhsuk-form-group">
-        <h1 class="nhsuk-heading-l">Who is the operation responsible consultant?</h1>
+        <h1 class="nhsuk-heading-l">Who is the operation supervising surgeon?</h1>
 
         <div class="nhsuk-form-group">
-          <label class="nhsuk-label" for="responsible-consultant-gmc">
+          <label class="nhsuk-label" for="supervising-surgeon-gmc">
             GMC number
           </label>
-          <div class="nhsuk-hint" id="responsible-consultant-gmc-hint">For example, 1234567</div>
+          <div class="nhsuk-hint" id="supervising-surgeon-gmc-hint">For example, 1234567</div>
 
           <input
             class="nhsuk-input nhsuk-input--width-10"
-            id="responsible-consultant-gmc"
-            name="responsibleConsultantGmc"
+            id="supervising-surgeon-gmc"
+            name="supervisingSurgeonGmc"
             type="text"
             inputmode="numeric"
             autocomplete="off"
-            aria-describedby="responsible-consultant-gmc-hint"
-            value="{{ data.responsibleConsultantGmc }}"
+            aria-describedby="supervising-surgeon-gmc-hint"
+            value="{{ data.supervisingSurgeonGmc }}"
           >
         </div>
       </div>

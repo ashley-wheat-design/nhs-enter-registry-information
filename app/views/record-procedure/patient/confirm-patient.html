@@ -21,16 +21,22 @@
             </h1>
           </legend>
 
+          <div class="nhsuk-inset-text">
+            <span class="nhsuk-u-visually-hidden">Information: </span>
+            <p>Any changes made to the patient's record will be submitted to the Personal Demographics Service (PDS).</p>
+          </div>
           <dl class="nhsuk-summary-list">
 
             <div class="nhsuk-summary-list__row">
               <dt class="nhsuk-summary-list__key">Name</dt>
               <dd class="nhsuk-summary-list__value">{{ p.firstName }} {{ p.lastName }}</dd>
+              <dd class="nhsuk-summary-list__actions"><a href="">Change</a></dd>
             </div>
 
             <div class="nhsuk-summary-list__row">
               <dt class="nhsuk-summary-list__key">Date of birth</dt>
               <dd class="nhsuk-summary-list__value">{{ p.dob }}</dd>
+              <dd class="nhsuk-summary-list__actions"><a href="">Change</a></dd>
             </div>
 
             <div class="nhsuk-summary-list__row">
@@ -38,28 +44,36 @@
               <dd class="nhsuk-summary-list__value">
                 {{ p.address | join('<br>') | safe }}
               </dd>
+              <dd class="nhsuk-summary-list__actions"><a href="">Change</a></dd>
             </div>
 
             <div class="nhsuk-summary-list__row">
               <dt class="nhsuk-summary-list__key">Email address</dt>
               <dd class="nhsuk-summary-list__value">
                 {% if p.emailAddress %}
-                  {{ p.emailAddress }}
+                {{ p.emailAddress }}
                 {% else %}
-                  <a class="nhsuk-link" href="/record-procedure/patient/enter-email">Enter email address</a>
+                <a class="nhsuk-link" href="/record-procedure/patient/enter-email">Enter email address</a>
                 {% endif %}
+              <dd class="nhsuk-summary-list__actions">
+                {% if p.emailAddress == '' %}
+                <a href="">Change</a>
+                {% endif %}
+              </dd>
               </dd>
             </div>
 
             <div class="nhsuk-summary-list__row">
               <dt class="nhsuk-summary-list__key">Gender</dt>
               <dd class="nhsuk-summary-list__value">{{ p.gender }}</dd>
+              <dd class="nhsuk-summary-list__actions"><a href="">Change</a></dd>
             </div>
 
 
             <div class="nhsuk-summary-list__row">
               <dt class="nhsuk-summary-list__key">NHS number</dt>
               <dd class="nhsuk-summary-list__value">{{ p.nhsNumber }}</dd>
+              <dd class="nhsuk-summary-list__actions"><a href="">Change</a></dd>
             </div>
 
             <div class="nhsuk-summary-list__row">
@@ -67,16 +81,22 @@
               <dd class="nhsuk-summary-list__value">
                 {{ p.registeredGp | join('<br>') | safe }}
               </dd>
+              <dd class="nhsuk-summary-list__actions"><a href="">Change</a></dd>
             </div>
 
             <div class="nhsuk-summary-list__row">
               <dt class="nhsuk-summary-list__key">Height</dt>
               <dd class="nhsuk-summary-list__value">
                 {% if p.heightCm %}
-                  {{ p.heightCm }} cm
+                {{ p.heightCm }} cm
                 {% else %}
-                  <a class="nhsuk-link" href="/record-procedure/patient/enter-height">Enter height</a>
+                <a class="nhsuk-link" href="/record-procedure/patient/enter-height">Enter height</a>
                 {% endif %}
+              <dd class="nhsuk-summary-list__actions">
+                {% if p.heightCm == '' %}
+                <a href="">Change</a>
+                {% endif %}
+              </dd>
               </dd>
             </div>
 
@@ -84,10 +104,15 @@
               <dt class="nhsuk-summary-list__key">Weight</dt>
               <dd class="nhsuk-summary-list__value">
                 {% if p.weightKg %}
-                  {{ p.weightKg }} kg
+                {{ p.weightKg }} kg
                 {% else %}
-                  <a class="nhsuk-link" href="/record-procedure/patient/enter-weight">Enter weight</a>
+                <a class="nhsuk-link" href="/record-procedure/patient/enter-weight">Enter weight</a>
                 {% endif %}
+              <dd class="nhsuk-summary-list__actions">
+                {% if p.weightKg == '' %}
+                <a href="">Change</a>
+                {% endif %}
+              </dd>
               </dd>
             </div>
 

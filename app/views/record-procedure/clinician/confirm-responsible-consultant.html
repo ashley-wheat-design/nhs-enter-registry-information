@@ -1,0 +1,43 @@
+{% extends '../../layout.html' %}
+{% set pageName = "Confirm operation responsible consultant" %}
+{% set currentSection = "record-procedure" %}
+
+{% block beforeContent %}
+<a class="nhsuk-back-link" href="/record-procedure/clinician/responsible-consultant">Back</a>
+{% endblock %}
+
+{% block content %}
+<div class="nhsuk-grid-row">
+  <div class="nhsuk-grid-column-two-thirds">
+
+    <form class="form" action="/record-procedure/clinician/confirm-responsible-consultant" method="post">
+      <h1 class="nhsuk-heading-l">Confirm the operation responsible consultant</h1>
+
+      {% set c = data.responsibleConsultant %}
+
+      {% if c %}
+        <div class="nhsuk-card">
+          <div class="nhsuk-card__content">
+            <h2 class="nhsuk-card__heading nhsuk-heading-s">
+              {{ c.title }} {{ c.firstName }} {{ c.lastName }}<br>
+              <div class="nhsuk-hint">{{ c.role }}</div>
+            </h2>
+            <p class="nhsuk-card__description">
+              <strong>GMC number:</strong> {{ c.gmc }}
+            </p>
+          </div>
+        </div>
+      {% else %}
+        <p class="nhsuk-body">We could not find a clinician with that GMC number.</p>
+      {% endif %}
+
+      <button class="nhsuk-button" data-module="nhsuk-button" type="submit">Confirm</button>
+    </form>
+
+    <p class="nhsuk-body">
+      <a href="/record-procedure/clinician/responsible-consultant">This is not the right person</a>
+    </p>
+
+  </div>
+</div>
+{% endblock %}

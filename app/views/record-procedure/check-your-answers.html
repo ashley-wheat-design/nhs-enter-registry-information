@@ -1,0 +1,308 @@
+{% extends '../layout.html' %}
+{% set pageName = "Check patient details" %}
+{% set p = data.selectedPatient %}
+
+{% block beforeContent %}
+<a class="nhsuk-back-link" href="#">
+  Back
+</a>
+{% endblock %}
+
+{% block content %}
+
+<div class="nhsuk-grid-row">
+  <div class="nhsuk-grid-column-two-thirds">
+    <form class="form" action="/record-procedure/patient/patient-information-complete" method="post">
+      <div class="nhsuk-form-group">
+        <fieldset class="nhsuk-fieldset">
+          <legend class="nhsuk-fieldset__legend nhsuk-fieldset__legend--l">
+            <h1 class="nhsuk-fieldset__heading">
+              Check your answers before submitting
+            </h1>
+          </legend>
+
+          <div class="nhsuk-card">
+            <div class="nhsuk-card__content">
+              <h3 class="nhsuk-card__heading">
+                Patient details
+              </h3>
+              <dl class="nhsuk-summary-list">
+
+                <div class="nhsuk-summary-list__row">
+                  <dt class="nhsuk-summary-list__key">Name</dt>
+                  <dd class="nhsuk-summary-list__value">{{ p.firstName }} {{ p.lastName }}</dd>
+                </div>
+
+                <div class="nhsuk-summary-list__row">
+                  <dt class="nhsuk-summary-list__key">Date of birth</dt>
+                  <dd class="nhsuk-summary-list__value">{{ p.dob }}</dd>
+                </div>
+
+                <div class="nhsuk-summary-list__row">
+                  <dt class="nhsuk-summary-list__key">Address</dt>
+                  <dd class="nhsuk-summary-list__value">
+                    {{ p.address | join('<br>') | safe }}
+                  </dd>
+                </div>
+
+                <div class="nhsuk-summary-list__row">
+                  <dt class="nhsuk-summary-list__key">Email address</dt>
+                  <dd class="nhsuk-summary-list__value">
+                    {% if p.emailAddress %}
+                    {{ p.emailAddress }}
+                    {% else %}
+                    Not entered
+                    {% endif %}
+                  </dd>
+                </div>
+
+                <div class="nhsuk-summary-list__row">
+                  <dt class="nhsuk-summary-list__key">Gender</dt>
+                  <dd class="nhsuk-summary-list__value">{{ p.gender }}</dd>
+                </div>
+
+
+                <div class="nhsuk-summary-list__row">
+                  <dt class="nhsuk-summary-list__key">NHS number</dt>
+                  <dd class="nhsuk-summary-list__value">{{ p.nhsNumber }}</dd>
+                </div>
+
+                <div class="nhsuk-summary-list__row">
+                  <dt class="nhsuk-summary-list__key">Registered GP</dt>
+                  <dd class="nhsuk-summary-list__value">
+                    {{ p.registeredGp | join('<br>') | safe }}
+                  </dd>
+                </div>
+
+                <div class="nhsuk-summary-list__row">
+                  <dt class="nhsuk-summary-list__key">Height</dt>
+                  <dd class="nhsuk-summary-list__value">
+                    {% if p.heightCm %}
+                    {{ p.heightCm }} cm
+                    {% else %}
+                    Not entered
+                    {% endif %}
+                  </dd>
+                </div>
+
+                <div class="nhsuk-summary-list__row">
+                  <dt class="nhsuk-summary-list__key">Weight</dt>
+                  <dd class="nhsuk-summary-list__value">
+                    {% if p.weightKg %}
+                    {{ p.weightKg }} kg
+                    {% else %}
+                    Not entered
+                    {% endif %}
+                  </dd>
+                </div>
+
+              </dl>
+            </div>
+          </div>
+
+          <div class="nhsuk-card">
+            <div class="nhsuk-card__content">
+              <h3 class="nhsuk-card__heading">
+                Operation details
+              </h3>
+              <dl class="nhsuk-summary-list">
+
+                <div class="nhsuk-summary-list__row">
+                  <dt class="nhsuk-summary-list__key">Procedure date</dt>
+                  <dd class="nhsuk-summary-list__value">{{ data.procedureDate }}</dd>
+                </div>
+
+                <div class="nhsuk-summary-list__row">
+                  <dt class="nhsuk-summary-list__key">Procedure time</dt>
+                  <dd class="nhsuk-summary-list__value">{{ data.procedureTime }}</dd>
+                </div>
+
+                <div class="nhsuk-summary-list__row">
+                  <dt class="nhsuk-summary-list__key">Primary diagnosis</dt>
+                  <dd class="nhsuk-summary-list__value">
+                    {% set primaryCode = data.diagnosisCodes[0] %}
+                    {{ primaryCode }} - {{ icd10[primaryCode] }}
+                  </dd>
+                </div>
+
+                {% if data.diagnosisCodes and data.diagnosisCodes.length > 1 %}
+                <div class="nhsuk-summary-list__row">
+                  <dt class="nhsuk-summary-list__key">Additional diagnoses</dt>
+                  <dd class="nhsuk-summary-list__value">
+                    {% for code in data.diagnosisCodes %}
+
+                    {% if not loop.first %}
+                    <div class="nhsuk-u-margin-bottom-2">
+                      {{ code }}{% if icd10[code] %} - {{ icd10[code] }}{% endif %}
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                  </dd>
+                </div>
+                {% endif %}
+
+                <div class="nhsuk-summary-list__row">
+                  <dt class="nhsuk-summary-list__key">ASA physical status</dt>
+                  <dd class="nhsuk-summary-list__value">
+                    {{ asa }} - {{ asaPhysicalStatus[asa] }}
+                  </dd>
+                </div>
+
+                <div class="nhsuk-summary-list__row">
+                  <dt class="nhsuk-summary-list__key">Operation outcome</dt>
+                  <dd class="nhsuk-summary-list__value">
+                    {% if data.currentOperation.operationOutcome == 'implant' %}
+                    Implant
+                    {% elif data.currentOperation.operationOutcome == 'device-removal' %}
+                    Removal of device
+                    {% elif data.currentOperation.operationOutcome == 'replacement' %}
+                    Replacement (removal and implant)
+                    {% elif data.currentOperation.operationOutcome == 'other' %}
+                    Other
+                    {% if data.currentOperation.operationOutcomeOtherDetail %}
+                    <br><span class="nhsuk-hint">{{ data.currentOperation.operationOutcomeOtherDetail }}</span>
+                    {% endif %}
+                    {% else %}
+                    —
+                    {% endif %}
+                  </dd>
+                </div>
+
+                <div class="nhsuk-summary-list__row">
+                  <dt class="nhsuk-summary-list__key">Anatomical side</dt>
+                  <dd class="nhsuk-summary-list__value">
+                    {% set lat = data.currentOperation.laterality %}
+                    {% if lat == 'L' %}Left
+                    {% elif lat == 'R' %}Right
+                    {% elif lat == 'B' %}Bilateral
+                    {% elif lat == 'M' %}Midline
+                    {% elif lat == '8' %}Not applicable
+                    {% elif lat == '9' %}Not known
+                    {% else %}—
+                    {% endif %}
+                  </dd>
+                </div>
+
+              </dl>
+            </div>
+          </div>
+
+          <div class="nhsuk-card">
+            <div class="nhsuk-card__content">
+              {% set devicesAdded = data.currentOperationDevices or [] %}
+              <h3 class="nhsuk-card__heading">
+                Devices {{ data.operationOutcome + 'ed' }} ({{devicesAdded.length}})
+              </h3>
+              {% for d in devicesAdded %}
+              <div class="nhsuk-card nhsuk-u-margin-bottom-4">
+                <div class="nhsuk-card__content">
+                  <h3 class="nhsuk-card__heading nhsuk-heading-xs">
+                    {{ d.medicalDeviceBrandOrModelName }}
+                  </h3>
+                  <p class="nhsuk-card__description nhsuk-u-margin-bottom-3 nhsuk-body-s">
+                    {{ d.productDescription }}
+                  </p>
+                  <dl class="nhsuk-summary-list nhsuk-summary-list--no-border ">
+                    <div class="nhsuk-summary-list__row nhsuk-body-s">
+                      <dt class="nhsuk-summary-list__key">
+                        Manufacturer
+                      </dt>
+                      <dd class="nhsuk-summary-list__value">
+                        {{ d.deviceManufacturer }}
+                      </dd>
+                    </div>
+                    <div class="nhsuk-summary-list__row nhsuk-body-s">
+                      <dt class="nhsuk-summary-list__key">
+                        Reference
+                      </dt>
+                      <dd class="nhsuk-summary-list__value">
+                        {{ d.medicalDeviceReferenceNumber }}
+                      </dd>
+                    </div>
+                    <div class="nhsuk-summary-list__row nhsuk-body-s">
+                      <dt class="nhsuk-summary-list__key">
+                        Serial
+                      </dt>
+                      <dd class="nhsuk-summary-list__value">
+                        {{ d.medicalDeviceSerialNumber }}
+                      </dd>
+                    </div>
+                    <div class="nhsuk-summary-list__row nhsuk-body-s">
+                      <dt class="nhsuk-summary-list__key">
+                        Lot
+                      </dt>
+                      <dd class="nhsuk-summary-list__value">
+                        {{ d.medicalDeviceLotNumber }}
+                      </dd>
+                    </div>
+                    <div class="nhsuk-summary-list__row nhsuk-body-s">
+                      <dt class="nhsuk-summary-list__key">
+                        Expiry
+                      </dt>
+                      <dd class="nhsuk-summary-list__value">
+                        {{ d.medicalDeviceExpiryDate }}
+                      </dd>
+                    </div>
+                    <div class="nhsuk-summary-list__row nhsuk-body-s">
+                      <dt class="nhsuk-summary-list__key">
+                        UDI
+                      </dt>
+                      <dd class="nhsuk-summary-list__value">
+                        {{ d.uniqueDeviceIdentifier }}
+                      </dd>
+                    </div>
+                  </dl>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+
+          <div class="nhsuk-card">
+            <div class="nhsuk-card__content">
+              {% set responsible = data.responsibleConsultant %}
+    {% set supervising = data.supervisingSurgeon %}
+    {% set leadSurgeons = data.leadSurgeons or [] %}
+              <h3 class="nhsuk-card__heading">
+                Clinician details
+              </h3>
+              <dl class="nhsuk-summary-list nhsuk-summary-list--no-border">
+  <div class="nhsuk-summary-list__row">
+    <dt class="nhsuk-summary-list__key">
+      Operation responsible consultant
+    </dt>
+    <dd class="nhsuk-summary-list__value">
+      
+    </dd>
+  </div>
+  <div class="nhsuk-summary-list__row">
+    <dt class="nhsuk-summary-list__key">
+      Operation supervising surgeon
+    </dt>
+    <dd class="nhsuk-summary-list__value">
+      
+    </dd>
+  </div>
+  <div class="nhsuk-summary-list__row">
+    <dt class="nhsuk-summary-list__key">
+      Operation lead surgeons
+    </dt>
+    <dd class="nhsuk-summary-list__value">
+      
+    </dd>
+  </div>
+</dl>
+            </div>
+          </div>
+
+        </fieldset>
+      </div>
+
+      <button class="nhsuk-button" data-module="nhsuk-button" type="submit">
+        Confirm and submit
+      </button>
+    </form>
+  </div>
+</div>
+
+{% endblock %}

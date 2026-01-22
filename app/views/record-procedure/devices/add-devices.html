@@ -21,8 +21,10 @@
     </form>
 
     {% if devicesAdded.length == 0 %}
-    <div class="nhsuk-inset-text nhsuk-u-margin-top-4 nhsuk-u-margin-bottom-8"><p class="nhsuk-body">There are no devices added yet.</p></div>
-    
+    <div class="nhsuk-inset-text nhsuk-u-margin-top-4 nhsuk-u-margin-bottom-8">
+      <p class="nhsuk-body">There are no devices added yet.</p>
+    </div>
+
     {% else %}
     {% for d in devicesAdded %}
     <div class="nhsuk-card">

@@ -268,48 +268,35 @@
 
           <div class="nhsuk-card">
             <div class="nhsuk-card__content">
-              <h3 class="nhsuk-card__heading">Clinician details</h3>
-
-              <dl class="nhsuk-summary-list">
+              {% set responsible = data.responsibleConsultant %}
+              {% set supervising = data.supervisingSurgeon %}
+              {% set leadSurgeons = data.leadSurgeons or [] %}
+              <h3 class="nhsuk-card__heading">
+                Clinician details
+              </h3>
+              <dl class="nhsuk-summary-list nhsuk-summary-list--no-border">
                 <div class="nhsuk-summary-list__row">
-                  <dt class="nhsuk-summary-list__key">Operation responsible consultant</dt>
+                  <dt class="nhsuk-summary-list__key">
+                    Operation responsible consultant
+                  </dt>
                   <dd class="nhsuk-summary-list__value">
-                    {% if responsible %}
-                      <strong>{{ responsible.firstName }} {{ responsible.lastName }}</strong>
-                      <div class="nhsuk-hint">GMC number: {{ responsible.gmc }}</div>
-                    {% else %}
-                      —
-                    {% endif %}
+
                   </dd>
                 </div>
-
                 <div class="nhsuk-summary-list__row">
-                  <dt class="nhsuk-summary-list__key">Operation supervising surgeon</dt>
+                  <dt class="nhsuk-summary-list__key">
+                    Operation supervising surgeon
+                  </dt>
                   <dd class="nhsuk-summary-list__value">
-                    {% if supervising %}
-                      <strong>{{ supervising.firstName }} {{ supervising.lastName }}</strong>
-                      <div class="nhsuk-hint">GMC number: {{ supervising.gmc }}</div>
-                    {% else %}
-                      —
-                    {% endif %}
+
                   </dd>
                 </div>
-
                 <div class="nhsuk-summary-list__row">
-                  <dt class="nhsuk-summary-list__key">Operation lead surgeons</dt>
+                  <dt class="nhsuk-summary-list__key">
+                    Operation lead surgeons
+                  </dt>
                   <dd class="nhsuk-summary-list__value">
-                    {% if leadSurgeons.length %}
-                      <ul class="nhsuk-list nhsuk-u-margin-bottom-0">
-                        {% for c in leadSurgeons %}
-                          <li><strong>{{ c.firstName }} {{ c.lastName }}</strong>
-                            <div class="nhsuk-hint">GMC number: {{ c.gmc }}</div>
-                          </li>
-                          
-                        {% endfor %}
-                      </ul>
-                    {% else %}
-                      —
-                    {% endif %}
+
                   </dd>
                 </div>
               </dl>

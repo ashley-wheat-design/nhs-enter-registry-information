@@ -16,19 +16,19 @@
       {% set c = data.supervisingSurgeon %}
 
       {% if c %}
-        <div class="nhsuk-card">
-          <div class="nhsuk-card__content">
-            <h2 class="nhsuk-card__heading nhsuk-heading-s">
-              {{ c.title }} {{ c.firstName }} {{ c.lastName }}
-              <div class="nhsuk-hint">{{ c.role }}</div>
-            </h2>
-            <p class="nhsuk-card__description">
-              <strong>GMC number:</strong> {{ c.gmc }}
-            </p>
-          </div>
+      <div class="nhsuk-card">
+        <div class="nhsuk-card__content">
+          <h2 class="nhsuk-card__heading nhsuk-heading-s">
+            {{ c.title }} {{ c.firstName }} {{ c.lastName }}
+            <div class="nhsuk-hint">{{ c.role }}</div>
+          </h2>
+          <p class="nhsuk-card__description">
+            <strong>GMC number:</strong> {{ c.gmc }}
+          </p>
         </div>
+      </div>
       {% else %}
-        <p class="nhsuk-body">We could not find a clinician with that GMC number.</p>
+      <p class="nhsuk-body">We could not find a clinician with that GMC number.</p>
       {% endif %}
 
       <button class="nhsuk-button" data-module="nhsuk-button" type="submit">Confirm</button>

@@ -15,71 +15,66 @@
       <div class="nhsuk-form-group">
         <fieldset class="nhsuk-fieldset">
 
+          <h1 class="nhsuk-heading-l">Search for the patient</h1>
 
-
-
-
-
-            <h1 class="nhsuk-heading-l">Search for the patient</h1>
-
-            <form action="/record-vaccinations/patient-search" method="post">
-              <div class="nhsuk-form-group">
-                <label class="nhsuk-label" for="firstName">
-                  First name
-                </label>
-                <input class="nhsuk-input nhsuk-input--width-20" id="firstName" name="firstName" type="text">
-              </div>
-              <div class="nhsuk-form-group">
-                <label class="nhsuk-label" for="lastName">
-                  Last name
-                </label>
-                <input class="nhsuk-input nhsuk-input--width-20" id="lastName" name="lastName" type="text">
-              </div>
-              <div class="nhsuk-form-group">
-                <fieldset class="nhsuk-fieldset" role="group" aria-describedby="dateOfBirth-hint">
-                  <legend class="nhsuk-fieldset__legend">
-                    Date of birth
-                  </legend>
-                  <div id="dateOfBirth-hint" class="nhsuk-hint">
-                    For example, 15 3 1984
-                  </div>
-                  <div id="dateOfBirth" class="nhsuk-date-input">
-                    <div class="nhsuk-date-input__item">
-                      <div class="nhsuk-form-group">
-                        <label class="nhsuk-label nhsuk-date-input__label" for="dateOfBirth-day">
-                          Day
-                        </label>
-                        <input class="nhsuk-input nhsuk-date-input__input nhsuk-input--width-2 " id="dateOfBirth-day"
-                          name="dateOfBirth[day]" type="text" inputmode="numeric">
-                      </div>
-                    </div>
-                    <div class="nhsuk-date-input__item">
-                      <div class="nhsuk-form-group">
-                        <label class="nhsuk-label nhsuk-date-input__label" for="dateOfBirth-month">
-                          Month
-                        </label>
-                        <input class="nhsuk-input nhsuk-date-input__input nhsuk-input--width-2 " id="dateOfBirth-month"
-                          name="dateOfBirth[month]" type="text" inputmode="numeric">
-                      </div>
-                    </div>
-                    <div class="nhsuk-date-input__item">
-                      <div class="nhsuk-form-group">
-                        <label class="nhsuk-label nhsuk-date-input__label" for="dateOfBirth-year">
-                          Year
-                        </label>
-                        <input class="nhsuk-input nhsuk-date-input__input nhsuk-input--width-4 " id="dateOfBirth-year"
-                          name="dateOfBirth[year]" type="text" inputmode="numeric">
-                      </div>
+          <form action="/record-vaccinations/patient-search" method="post">
+            <div class="nhsuk-form-group">
+              <label class="nhsuk-label" for="firstName">
+                First name
+              </label>
+              <input class="nhsuk-input nhsuk-input--width-20" id="firstName" name="firstName" type="text">
+            </div>
+            <div class="nhsuk-form-group">
+              <label class="nhsuk-label" for="lastName">
+                Last name
+              </label>
+              <input class="nhsuk-input nhsuk-input--width-20" id="lastName" name="lastName" type="text">
+            </div>
+            <div class="nhsuk-form-group">
+              <fieldset class="nhsuk-fieldset" role="group" aria-describedby="dateOfBirth-hint">
+                <legend class="nhsuk-fieldset__legend">
+                  Date of birth
+                </legend>
+                <div id="dateOfBirth-hint" class="nhsuk-hint">
+                  For example, 15 3 1984
+                </div>
+                <div id="dateOfBirth" class="nhsuk-date-input">
+                  <div class="nhsuk-date-input__item">
+                    <div class="nhsuk-form-group">
+                      <label class="nhsuk-label nhsuk-date-input__label" for="dateOfBirth-day">
+                        Day
+                      </label>
+                      <input class="nhsuk-input nhsuk-date-input__input nhsuk-input--width-2 " id="dateOfBirth-day"
+                        name="dateOfBirth[day]" type="text" inputmode="numeric">
                     </div>
                   </div>
-                </fieldset>
-              </div>
-              <div class="nhsuk-form-group">
-                <label class="nhsuk-label" for="postcode">
-                  Postcode (optional)
-                </label>
-                <input class="nhsuk-input nhsuk-input--width-10" id="postcode" name="postcode" type="text">
-              </div>
+                  <div class="nhsuk-date-input__item">
+                    <div class="nhsuk-form-group">
+                      <label class="nhsuk-label nhsuk-date-input__label" for="dateOfBirth-month">
+                        Month
+                      </label>
+                      <input class="nhsuk-input nhsuk-date-input__input nhsuk-input--width-2 " id="dateOfBirth-month"
+                        name="dateOfBirth[month]" type="text" inputmode="numeric">
+                    </div>
+                  </div>
+                  <div class="nhsuk-date-input__item">
+                    <div class="nhsuk-form-group">
+                      <label class="nhsuk-label nhsuk-date-input__label" for="dateOfBirth-year">
+                        Year
+                      </label>
+                      <input class="nhsuk-input nhsuk-date-input__input nhsuk-input--width-4 " id="dateOfBirth-year"
+                        name="dateOfBirth[year]" type="text" inputmode="numeric">
+                    </div>
+                  </div>
+                </div>
+              </fieldset>
+            </div>
+            <div class="nhsuk-form-group">
+              <label class="nhsuk-label" for="postcode">
+                Postcode (optional)
+              </label>
+              <input class="nhsuk-input nhsuk-input--width-10" id="postcode" name="postcode" type="text">
+            </div>
         </fieldset>
       </div>
       <button class="nhsuk-button" data-module="nhsuk-button" type="submit">

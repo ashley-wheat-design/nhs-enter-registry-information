@@ -16,66 +16,66 @@
       {% set d = data.deviceToConfirm %}
 
       {% if d %}
-        <div class="nhsuk-card">
-      <div class="nhsuk-card__content">
-        <h3 class="nhsuk-card__heading nhsuk-heading-s">
-          {{ d.medicalDeviceBrandOrModelName }}
-        </h3>
-        <p class="nhsuk-card__description nhsuk-u-margin-bottom-3">
-          {{ d.productDescription }}
-        </p>
-        <dl class="nhsuk-summary-list nhsuk-summary-list--no-border">
-          <div class="nhsuk-summary-list__row">
-            <dt class="nhsuk-summary-list__key">
-              Manufacturer
-            </dt>
-            <dd class="nhsuk-summary-list__value">
-              {{ d.deviceManufacturer }}
-            </dd>
-          </div>
-          <div class="nhsuk-summary-list__row">
-            <dt class="nhsuk-summary-list__key">
-              Reference
-            </dt>
-            <dd class="nhsuk-summary-list__value">
-              {{ d.medicalDeviceReferenceNumber }}
-            </dd>
-          </div>
-          <div class="nhsuk-summary-list__row">
-            <dt class="nhsuk-summary-list__key">
-              Serial
-            </dt>
-            <dd class="nhsuk-summary-list__value">
-              {{ d.medicalDeviceSerialNumber }}
-            </dd>
-          </div>
-          <div class="nhsuk-summary-list__row">
-            <dt class="nhsuk-summary-list__key">
-              Lot
-            </dt>
-            <dd class="nhsuk-summary-list__value">
-              {{ d.medicalDeviceLotNumber }}
-            </dd>
-          </div>
-          <div class="nhsuk-summary-list__row">
-            <dt class="nhsuk-summary-list__key">
-              Expiry
-            </dt>
-            <dd class="nhsuk-summary-list__value">
-              {{ d.medicalDeviceExpiryDate }}
-            </dd>
-          </div>
-          <div class="nhsuk-summary-list__row">
-            <dt class="nhsuk-summary-list__key">
-              UDI
-            </dt>
-            <dd class="nhsuk-summary-list__value">
-              {{ d.uniqueDeviceIdentifier }}
-            </dd>
-          </div>
-        </dl>
+      <div class="nhsuk-card">
+        <div class="nhsuk-card__content">
+          <h3 class="nhsuk-card__heading nhsuk-heading-s">
+            {{ d.medicalDeviceBrandOrModelName }}
+          </h3>
+          <p class="nhsuk-card__description nhsuk-u-margin-bottom-3">
+            {{ d.productDescription }}
+          </p>
+          <dl class="nhsuk-summary-list nhsuk-summary-list--no-border">
+            <div class="nhsuk-summary-list__row">
+              <dt class="nhsuk-summary-list__key">
+                Manufacturer
+              </dt>
+              <dd class="nhsuk-summary-list__value">
+                {{ d.deviceManufacturer }}
+              </dd>
+            </div>
+            <div class="nhsuk-summary-list__row">
+              <dt class="nhsuk-summary-list__key">
+                Reference
+              </dt>
+              <dd class="nhsuk-summary-list__value">
+                {{ d.medicalDeviceReferenceNumber }}
+              </dd>
+            </div>
+            <div class="nhsuk-summary-list__row">
+              <dt class="nhsuk-summary-list__key">
+                Serial
+              </dt>
+              <dd class="nhsuk-summary-list__value">
+                {{ d.medicalDeviceSerialNumber }}
+              </dd>
+            </div>
+            <div class="nhsuk-summary-list__row">
+              <dt class="nhsuk-summary-list__key">
+                Lot
+              </dt>
+              <dd class="nhsuk-summary-list__value">
+                {{ d.medicalDeviceLotNumber }}
+              </dd>
+            </div>
+            <div class="nhsuk-summary-list__row">
+              <dt class="nhsuk-summary-list__key">
+                Expiry
+              </dt>
+              <dd class="nhsuk-summary-list__value">
+                {{ d.medicalDeviceExpiryDate }}
+              </dd>
+            </div>
+            <div class="nhsuk-summary-list__row">
+              <dt class="nhsuk-summary-list__key">
+                UDI
+              </dt>
+              <dd class="nhsuk-summary-list__value">
+                {{ d.uniqueDeviceIdentifier }}
+              </dd>
+            </div>
+          </dl>
+        </div>
       </div>
-    </div>
       {% endif %}
 
       <button class="nhsuk-button" data-module="nhsuk-button" type="submit">Add device</button>

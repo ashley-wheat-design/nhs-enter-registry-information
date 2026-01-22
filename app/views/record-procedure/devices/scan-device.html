@@ -19,6 +19,10 @@
         <span class="nhsuk-u-visually-hidden">Error:</span>
         {{ data.deviceScanError }}
       </p>
+      <p class="nhsuk-error-message">
+        <span class="nhsuk-u-visually-hidden">Error:</span>
+        {{ data.deviceScanError }}
+      </p>
       {% endif %}
 
       <div class="nhsuk-form-group">
@@ -26,9 +30,8 @@
         <div class="nhsuk-hint" id="scanned-udi-hint">
           Scan the device's barcode.
         </div>
-        <input class="nhsuk-input" id="scanned-device-code" name="scannedDeviceCode" type="text"
-          value="{{ data.scannedDeviceCode }}" {% if shouldAutofocus %}autofocus{% endif %}>
-
+        <input class="nhsuk-input" id="scanned-udi" name="scannedUdi" type="text" aria-describedby="scanned-udi-hint"
+          value="{{ data.scannedUdi }}">
       </div>
 
       <button class="nhsuk-button" data-module="nhsuk-button" type="submit">Continue</button>

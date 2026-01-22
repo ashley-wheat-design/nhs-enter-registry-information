@@ -1,6 +1,7 @@
 {% extends '../../layout.html' %}
 {% set pageName = "Scan a device" %}
 {% set currentSection = "record-procedure" %}
+{% set shouldAutofocus = data.hasScanner == true %}
 
 {% block beforeContent %}
 <a class="nhsuk-back-link" href="/record-procedure/devices/add-devices">Back</a>
@@ -14,25 +15,20 @@
       <h1 class="nhsuk-heading-l">Scan a device</h1>
 
       {% if data.deviceScanError %}
-        <p class="nhsuk-error-message">
-          <span class="nhsuk-u-visually-hidden">Error:</span>
-          {{ data.deviceScanError }}
-        </p>
+      <p class="nhsuk-error-message">
+        <span class="nhsuk-u-visually-hidden">Error:</span>
+        {{ data.deviceScanError }}
+      </p>
       {% endif %}
 
       <div class="nhsuk-form-group">
         <label class="nhsuk-label" for="scanned-udi">Barcode value</label>
         <div class="nhsuk-hint" id="scanned-udi-hint">
-          Scan the barcode, or paste the UDI string.
+          Scan the device's barcode.
         </div>
-        <input
-          class="nhsuk-input"
-          id="scanned-udi"
-          name="scannedUdi"
-          type="text"
-          aria-describedby="scanned-udi-hint"
-          value="{{ data.scannedUdi }}"
-        >
+        <input class="nhsuk-input" id="scanned-device-code" name="scannedDeviceCode" type="text"
+          value="{{ data.scannedDeviceCode }}" {% if shouldAutofocus %}autofocus{% endif %}>
+
       </div>
 
       <button class="nhsuk-button" data-module="nhsuk-button" type="submit">Continue</button>

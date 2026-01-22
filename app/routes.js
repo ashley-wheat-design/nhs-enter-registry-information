@@ -1,10 +1,13 @@
+// app/routes.js
+
 const express = require('express')
 const router = express.Router()
 const icd10 = require('./data/icd10')
 const asaPhysicalStatus = require('./data/asa-physical-status')
 const { clinicians, findClinicianByGmc } = require('./data/clinicians')
-const { devices, findDeviceByUdi } = require('./data/devices')
+const { devices, findDeviceByCode } = require('./data/devices')
 
+/* Function: session bootstrap */
 router.use((req, res, next) => {
   req.session.data ||= {}
 
@@ -42,34 +45,38 @@ router.use((req, res, next) => {
   next()
 })
 
-/* Start */
+/* Function: GET /record-procedure */
 router.get('/record-procedure', (req, res) => {
   delete req.session.data.nhsNumber
   delete req.session.data.selectedPatient
   res.render('record-procedure/barcode-scanner')
 })
 
+/* Function: POST /scanner-answer */
 router.post('/scanner-answer', (req, res) => {
   req.session.data.hasScanner = req.body.hasScanner === 'yes'
   res.redirect('record-procedure/task-list')
 })
 
-/* Patient */
+/* Function: GET /record-procedure/patient/has-nhs-number */
 router.get('/record-procedure/patient/has-nhs-number', (req, res) => {
   res.render('record-procedure/patient/has-nhs-number')
 })
 
+/* Function: POST /has-nhs-number-answer */
 router.post('/has-nhs-number-answer', (req, res) => {
   if (req.body.hasNHSNumber === 'yes') return res.redirect('/record-procedure/patient/nhs-number')
   return res.redirect('/record-procedure/patient/patient-search')
 })
 
+/* Function: GET /record-procedure/patient/nhs-number */
 router.get('/record-procedure/patient/nhs-number', (req, res) => {
   res.render('record-procedure/patient/nhs-number')
 })
 
+/* Function: POST /nhs-number-answer */
 router.post('/nhs-number-answer', (req, res) => {
-  const raw = (req.body.nhsNumber || '')
+  const raw = req.body.nhsNumber || ''
   const nhsNumber = raw.replace(/\s/g, '')
 
   req.session.data.nhsNumber = raw
@@ -92,21 +99,25 @@ router.post('/nhs-number-answer', (req, res) => {
   return res.redirect('/record-procedure/patient/confirm-patient')
 })
 
+/* Function: GET /record-procedure/patient/confirm-patient */
 router.get('/record-procedure/patient/confirm-patient', (req, res) => {
   if (!req.session.data.selectedPatient) return res.redirect('/record-procedure/patient/nhs-number')
   res.render('record-procedure/patient/confirm-patient')
 })
 
+/* Function: POST /record-procedure/patient/patient-information-complete */
 router.post('/record-procedure/patient/patient-information-complete', (req, res) => {
   req.session.data.patientInfoComplete = true
   return res.redirect('/record-procedure/task-list')
 })
 
+/* Function: GET /record-procedure/patient/enter-weight */
 router.get('/record-procedure/patient/enter-weight', (req, res) => {
   if (!req.session.data.selectedPatient) return res.redirect('/record-procedure/patient/nhs-number')
   res.render('record-procedure/patient/enter-weight')
 })
 
+/* Function: POST /record-procedure/patient/enter-weight */
 router.post('/record-procedure/patient/enter-weight', (req, res) => {
   const raw = (req.body.weight || '').trim()
 
@@ -117,11 +128,13 @@ router.post('/record-procedure/patient/enter-weight', (req, res) => {
   res.redirect('/record-procedure/patient/confirm-patient')
 })
 
+/* Function: GET /record-procedure/patient/enter-height */
 router.get('/record-procedure/patient/enter-height', (req, res) => {
   if (!req.session.data.selectedPatient) return res.redirect('/record-procedure/patient/nhs-number')
   res.render('record-procedure/patient/enter-height')
 })
 
+/* Function: POST /record-procedure/patient/enter-height */
 router.post('/record-procedure/patient/enter-height', (req, res) => {
   const raw = (req.body.height || '').trim()
 
@@ -132,11 +145,13 @@ router.post('/record-procedure/patient/enter-height', (req, res) => {
   res.redirect('/record-procedure/patient/confirm-patient')
 })
 
+/* Function: GET /record-procedure/patient/enter-email */
 router.get('/record-procedure/patient/enter-email', (req, res) => {
   if (!req.session.data.selectedPatient) return res.redirect('/record-procedure/patient/nhs-number')
   res.render('record-procedure/patient/enter-email')
 })
 
+/* Function: POST /record-procedure/patient/enter-email */
 router.post('/record-procedure/patient/enter-email', (req, res) => {
   const email = req.body.emailAddress
 
@@ -147,7 +162,7 @@ router.post('/record-procedure/patient/enter-email', (req, res) => {
   res.redirect('/record-procedure/patient/confirm-patient')
 })
 
-/* Procedure */
+/* Function: POST /record-procedure/procedure/procedure-date */
 router.post('/record-procedure/procedure/procedure-date', (req, res) => {
   const procedureDateToday = req.body.procedureDateToday
 
@@ -158,7 +173,7 @@ router.post('/record-procedure/procedure/procedure-date', (req, res) => {
     const month = String(now.getMonth() + 1).padStart(2, '0')
     const year = now.getFullYear()
 
-    req.session.data.procedureDate = `${day}-${month}-${year}`
+    req.session.data.procedureDate = `${day}/${month}/${year}`
 
     delete req.session.data.procedureDateDay
     delete req.session.data.procedureDateMonth
@@ -173,7 +188,7 @@ router.post('/record-procedure/procedure/procedure-date', (req, res) => {
       return res.redirect('/record-procedure/procedure/procedure-date')
     }
 
-    req.session.data.procedureDate = `${day}-${month}-${year}`
+    req.session.data.procedureDate = `${day}/${month}/${year}`
 
     req.session.data.procedureDateDay = day
     req.session.data.procedureDateMonth = month
@@ -185,6 +200,7 @@ router.post('/record-procedure/procedure/procedure-date', (req, res) => {
   return res.redirect('/record-procedure/procedure/procedure-time')
 })
 
+/* Function: POST /record-procedure/procedure/procedure-time */
 router.post('/record-procedure/procedure/procedure-time', (req, res) => {
   let procedureTime = (req.body.procedureTime || '').trim()
 
@@ -203,6 +219,7 @@ router.post('/record-procedure/procedure/procedure-time', (req, res) => {
   res.redirect('/record-procedure/procedure/primary-diagnosis')
 })
 
+/* Function: POST /record-procedure/procedure/primary-diagnosis */
 router.post('/record-procedure/procedure/primary-diagnosis', (req, res) => {
   const code = req.body.primaryDiagnosisCode
 
@@ -215,10 +232,12 @@ router.post('/record-procedure/procedure/primary-diagnosis', (req, res) => {
   return res.redirect('/record-procedure/procedure/diagnosis-summary')
 })
 
+/* Function: GET /record-procedure/procedure/add-diagnosis */
 router.get('/record-procedure/procedure/add-diagnosis', (req, res) => {
   res.render('record-procedure/procedure/add-diagnosis')
 })
 
+/* Function: POST /record-procedure/procedure/add-diagnosis */
 router.post('/record-procedure/procedure/add-diagnosis', (req, res) => {
   const code = req.body.diagnosisCode
 
@@ -240,6 +259,7 @@ router.post('/record-procedure/procedure/add-diagnosis', (req, res) => {
   return res.redirect('/record-procedure/procedure/diagnosis-summary')
 })
 
+/* Function: POST /record-procedure/procedure/physical-status */
 router.post('/record-procedure/procedure/physical-status', (req, res) => {
   const asa = req.body.asaClassification
 
@@ -256,6 +276,7 @@ router.post('/record-procedure/procedure/physical-status', (req, res) => {
   return res.redirect('/record-procedure/procedure/operation-details')
 })
 
+/* Function: POST /record-procedure/procedure/operation-details */
 router.post('/record-procedure/procedure/operation-details', (req, res) => {
   req.session.data.currentOperation ||= {}
 
@@ -266,10 +287,12 @@ router.post('/record-procedure/procedure/operation-details', (req, res) => {
   return res.redirect('/record-procedure/procedure/operation-summary')
 })
 
+/* Function: GET /record-procedure/procedure/operation-summary */
 router.get('/record-procedure/procedure/operation-summary', (req, res) => {
   res.render('record-procedure/procedure/operation-summary')
 })
 
+/* Function: POST /record-procedure/procedure/confirm */
 router.post('/record-procedure/procedure/confirm', (req, res) => {
   const patient = req.session.data.selectedPatient
   if (!patient) {
@@ -313,11 +336,12 @@ router.post('/record-procedure/procedure/confirm', (req, res) => {
   return res.redirect('/record-procedure/task-list')
 })
 
-/* Clinicians */
+/* Function: GET /record-procedure/clinician/responsible-consultant */
 router.get('/record-procedure/clinician/responsible-consultant', (req, res) => {
   res.render('record-procedure/clinician/responsible-consultant')
 })
 
+/* Function: POST /record-procedure/clinician/responsible-consultant */
 router.post('/record-procedure/clinician/responsible-consultant', (req, res) => {
   const gmc = (req.session.data.responsibleConsultantGmc || '').trim()
   req.session.data.responsibleConsultant = findClinicianByGmc(gmc)
@@ -331,18 +355,22 @@ router.post('/record-procedure/clinician/responsible-consultant', (req, res) => 
   return res.redirect('/record-procedure/clinician/confirm-responsible-consultant')
 })
 
+/* Function: GET /record-procedure/clinician/confirm-responsible-consultant */
 router.get('/record-procedure/clinician/confirm-responsible-consultant', (req, res) => {
   res.render('record-procedure/clinician/confirm-responsible-consultant')
 })
 
+/* Function: POST /record-procedure/clinician/confirm-responsible-consultant */
 router.post('/record-procedure/clinician/confirm-responsible-consultant', (req, res) => {
   res.redirect('/record-procedure/clinician/supervising-surgeon')
 })
 
+/* Function: GET /record-procedure/clinician/supervising-surgeon */
 router.get('/record-procedure/clinician/supervising-surgeon', (req, res) => {
   res.render('record-procedure/clinician/supervising-surgeon')
 })
 
+/* Function: POST /record-procedure/clinician/supervising-surgeon */
 router.post('/record-procedure/clinician/supervising-surgeon', (req, res) => {
   const gmc = (req.session.data.supervisingSurgeonGmc || '').trim()
   req.session.data.supervisingSurgeon = findClinicianByGmc(gmc)
@@ -356,19 +384,23 @@ router.post('/record-procedure/clinician/supervising-surgeon', (req, res) => {
   return res.redirect('/record-procedure/clinician/confirm-supervising-surgeon')
 })
 
+/* Function: GET /record-procedure/clinician/confirm-supervising-surgeon */
 router.get('/record-procedure/clinician/confirm-supervising-surgeon', (req, res) => {
   res.render('record-procedure/clinician/confirm-supervising-surgeon')
 })
 
+/* Function: POST /record-procedure/clinician/confirm-supervising-surgeon */
 router.post('/record-procedure/clinician/confirm-supervising-surgeon', (req, res) => {
   res.redirect('/record-procedure/clinician/operation-lead-surgeon')
 })
 
+/* Function: GET /record-procedure/clinician/operation-lead-surgeon */
 router.get('/record-procedure/clinician/operation-lead-surgeon', (req, res) => {
   req.session.data.leadSurgeons ||= []
   res.render('record-procedure/clinician/operation-lead-surgeon')
 })
 
+/* Function: POST /record-procedure/clinician/operation-lead-surgeon */
 router.post('/record-procedure/clinician/operation-lead-surgeon', (req, res) => {
   const gmc = (req.session.data.leadSurgeonGmc || '').trim()
   req.session.data.leadSurgeon = findClinicianByGmc(gmc)
@@ -382,11 +414,13 @@ router.post('/record-procedure/clinician/operation-lead-surgeon', (req, res) => 
   return res.redirect('/record-procedure/clinician/confirm-operation-lead-surgeon')
 })
 
+/* Function: GET /record-procedure/clinician/confirm-operation-lead-surgeon */
 router.get('/record-procedure/clinician/confirm-operation-lead-surgeon', (req, res) => {
   req.session.data.leadSurgeons ||= []
   res.render('record-procedure/clinician/confirm-operation-lead-surgeon')
 })
 
+/* Function: POST /record-procedure/clinician/confirm-operation-lead-surgeon */
 router.post('/record-procedure/clinician/confirm-operation-lead-surgeon', (req, res) => {
   req.session.data.leadSurgeons ||= []
 
@@ -400,30 +434,35 @@ router.post('/record-procedure/clinician/confirm-operation-lead-surgeon', (req, 
   return res.redirect('/record-procedure/clinician/clinicians-summary')
 })
 
+/* Function: GET /record-procedure/clinician/clinicians-summary */
 router.get('/record-procedure/clinician/clinicians-summary', (req, res) => {
   req.session.data.leadSurgeons ||= []
   res.render('record-procedure/clinician/clinicians-summary')
 })
 
+/* Function: POST /record-procedure/clinician/clinicians-summary */
 router.post('/record-procedure/clinician/clinicians-summary', (req, res) => {
   req.session.data.clinicianDetailsComplete = true
   return res.redirect('/record-procedure/task-list')
 })
 
+/* Function: GET /record-procedure/clinician/add-another-operation-lead-surgeon */
 router.get('/record-procedure/clinician/add-another-operation-lead-surgeon', (req, res) => {
   return res.redirect('/record-procedure/clinician/clinicians-summary')
 })
 
+/* Function: POST /record-procedure/clinician/add-another-operation-lead-surgeon */
 router.post('/record-procedure/clinician/add-another-operation-lead-surgeon', (req, res) => {
   return res.redirect('/record-procedure/clinician/clinicians-summary')
 })
 
-/* Devices */
+/* Function: GET /record-procedure/devices/add-devices */
 router.get('/record-procedure/devices/add-devices', (req, res) => {
   req.session.data.currentOperationDevices ||= []
   res.render('record-procedure/devices/add-devices')
 })
 
+/* Function: POST /record-procedure/devices/add-devices/add */
 router.post('/record-procedure/devices/add-devices/add', (req, res) => {
   req.session.data.currentOperationDevices ||= []
 
@@ -434,21 +473,23 @@ router.post('/record-procedure/devices/add-devices/add', (req, res) => {
   return res.redirect('/record-procedure/devices/select-device')
 })
 
+/* Function: GET /record-procedure/devices/scan-device */
 router.get('/record-procedure/devices/scan-device', (req, res) => {
-  req.session.data.scannedUdi = ''
+  req.session.data.scannedDeviceCode = ''
   req.session.data.deviceToConfirm = null
   res.render('record-procedure/devices/scan-device')
 })
 
+/* Function: POST /record-procedure/devices/scan-device */
 router.post('/record-procedure/devices/scan-device', (req, res) => {
-  const scanned = (req.body.scannedUdi || '').trim()
-  req.session.data.scannedUdi = scanned
+  const scanned = (req.body.scannedDeviceCode || req.body.scannedUdi || '').trim()
+  req.session.data.scannedDeviceCode = scanned
 
-  const found = findDeviceByUdi(scanned)
+  const found = findDeviceByCode(scanned)
   req.session.data.deviceToConfirm = found
 
   if (!found) {
-    req.session.data.deviceScanError = 'We could not find a device for that barcode'
+    req.session.data.deviceScanError = 'No device has been found with that barcode.'
     return res.redirect('/record-procedure/devices/scan-device')
   }
 
@@ -456,6 +497,7 @@ router.post('/record-procedure/devices/scan-device', (req, res) => {
   return res.redirect('/record-procedure/devices/confirm-device')
 })
 
+/* Function: GET /record-procedure/devices/confirm-device */
 router.get('/record-procedure/devices/confirm-device', (req, res) => {
   if (!req.session.data.deviceToConfirm) {
     return res.redirect('/record-procedure/devices/add-devices')
@@ -464,6 +506,7 @@ router.get('/record-procedure/devices/confirm-device', (req, res) => {
   res.render('record-procedure/devices/confirm-device')
 })
 
+/* Function: POST /record-procedure/devices/confirm-device */
 router.post('/record-procedure/devices/confirm-device', (req, res) => {
   req.session.data.currentOperationDevices ||= []
 
@@ -480,19 +523,23 @@ router.post('/record-procedure/devices/confirm-device', (req, res) => {
   }
 
   req.session.data.deviceToConfirm = null
-  req.session.data.scannedUdi = ''
+  req.session.data.scannedDeviceCode = ''
 
   return res.redirect('/record-procedure/devices/add-devices')
 })
 
+/* Function: GET /record-procedure/devices/select-device */
 router.get('/record-procedure/devices/select-device', (req, res) => {
   req.session.data.deviceToConfirm = null
   res.render('record-procedure/devices/select-device')
 })
 
+/* Function: POST /record-procedure/devices/select-device */
 router.post('/record-procedure/devices/select-device', (req, res) => {
-  const selectedUdi = (req.body.selectedUdi || '').trim()
-  const found = findDeviceByUdi(selectedUdi)
+  const selectedDeviceCode = (req.body.selectedDeviceCode || req.body.selectedUdi || '').trim()
+  req.session.data.selectedDeviceCode = selectedDeviceCode
+
+  const found = findDeviceByCode(selectedDeviceCode)
   req.session.data.deviceToConfirm = found
 
   if (!found) {
@@ -504,10 +551,9 @@ router.post('/record-procedure/devices/select-device', (req, res) => {
   return res.redirect('/record-procedure/devices/confirm-device')
 })
 
+/* Function: POST /record-procedure/devices/add-devices */
 router.post('/record-procedure/devices/add-devices', (req, res) => {
-  
   req.session.data.deviceDetailsComplete = true
-
   return res.redirect('/record-procedure/task-list')
 })
 

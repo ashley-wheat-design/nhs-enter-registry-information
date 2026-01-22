@@ -2,7 +2,7 @@
 
 const devices = [
   {
-    id: 'dev-1',
+    deviceCode: '912312311',
     status: 'Implanted',
     uniqueDeviceIdentifier:
       '(01)05050474810693(17)290630(10)LOT-ODYSSEY-01(21)SN-ODYSSEY-0001',
@@ -19,7 +19,7 @@ const devices = [
     medicalDeviceBrandOrModelName: 'TECNIS ODYSSEY'
   },
   {
-    id: 'dev-2',
+    deviceCode: '912312322',
     status: 'Implanted',
     uniqueDeviceIdentifier:
       '(01)05029867006838(17)290531(10)LOT-RAYONE-EMV-02(21)SN-RAYONE-0002',
@@ -36,7 +36,7 @@ const devices = [
     medicalDeviceBrandOrModelName: 'RayOne EMV'
   },
   {
-    id: 'dev-3',
+    deviceCode: '912312333',
     status: 'Implanted',
     uniqueDeviceIdentifier:
       '(01)10757770611246(17)280812(10)LOT-ENVISTA-03(21)SN-ENVISTA-0003',
@@ -53,7 +53,7 @@ const devices = [
     medicalDeviceBrandOrModelName: 'enVista Toric'
   },
   {
-    id: 'dev-4',
+    deviceCode: '912312344',
     status: 'Implanted',
     uniqueDeviceIdentifier:
       '(01)00380652552424(17)280630(10)LOT-ACRYSOF-04(21)SN-ACRYSOF-0004(240)MA60AC150',
@@ -70,7 +70,7 @@ const devices = [
     medicalDeviceBrandOrModelName: 'AcrySof'
   },
   {
-    id: 'dev-5',
+    deviceCode: '912312355',
     status: 'Implanted',
     uniqueDeviceIdentifier:
       '(01)05050474657496(17)281231(10)LOT-TECNIS-05(21)SN-TECNIS-0005',
@@ -86,10 +86,8 @@ const devices = [
     typeOfDeviceGmdnCode: '35658',
     medicalDeviceBrandOrModelName: 'TECNIS Toric'
   },
-
-  // A few non-lens examples so the list feels broader
   {
-    id: 'dev-6',
+    deviceCode: '912312366',
     status: 'Implanted',
     uniqueDeviceIdentifier:
       '(01)09501101530012(17)300101(10)LOT-PACE-06(21)SN-PACE-0006',
@@ -106,7 +104,7 @@ const devices = [
     medicalDeviceBrandOrModelName: 'Azure XT'
   },
   {
-    id: 'dev-7',
+    deviceCode: '912312377',
     status: 'Implanted',
     uniqueDeviceIdentifier:
       '(01)04012345678901(17)290101(10)LOT-HIP-07(21)SN-HIP-0007',
@@ -124,16 +122,13 @@ const devices = [
   }
 ]
 
-function normaliseUdi(value) {
-  return String(value || '').trim()
-}
-
-function findDeviceByUdi(udi) {
-  const key = normaliseUdi(udi)
-  return devices.find(d => normaliseUdi(d.uniqueDeviceIdentifier) === key) || null
+/* Function: findDeviceByCode */
+function findDeviceByCode(code) {
+  const key = String(code || '').trim()
+  return devices.find(d => String(d.deviceCode).trim() === key) || null
 }
 
 module.exports = {
   devices,
-  findDeviceByUdi
+  findDeviceByCode
 }

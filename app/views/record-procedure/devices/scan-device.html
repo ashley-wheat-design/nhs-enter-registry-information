@@ -15,23 +15,25 @@
       <h1 class="nhsuk-heading-l">Scan a device</h1>
 
       {% if data.deviceScanError %}
-      <p class="nhsuk-error-message">
-        <span class="nhsuk-u-visually-hidden">Error:</span>
-        {{ data.deviceScanError }}
-      </p>
-      <p class="nhsuk-error-message">
+      <p class="nhsuk-error-message" id="scanned-udi-error">
         <span class="nhsuk-u-visually-hidden">Error:</span>
         {{ data.deviceScanError }}
       </p>
       {% endif %}
 
-      <div class="nhsuk-form-group">
+      <div class="nhsuk-form-group{% if data.deviceScanError %} nhsuk-form-group--error{% endif %}">
         <label class="nhsuk-label" for="scanned-udi">Barcode value</label>
         <div class="nhsuk-hint" id="scanned-udi-hint">
           Scan the device's barcode.
         </div>
-        <input class="nhsuk-input" id="scanned-udi" name="scannedUdi" type="text" aria-describedby="scanned-udi-hint"
-          value="{{ data.scannedUdi }}">
+        <input
+          class="nhsuk-input"
+          id="scanned-udi"
+          name="scannedUdi"
+          type="text"
+          aria-describedby="scanned-udi-hint{% if data.deviceScanError %} scanned-udi-error{% endif %}"
+          value="{{ data.scannedUdi }}"
+        >
       </div>
 
       <button class="nhsuk-button" data-module="nhsuk-button" type="submit">Continue</button>

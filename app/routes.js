@@ -475,21 +475,44 @@ router.post('/record-procedure/devices/add-devices/add', (req, res) => {
 
 /* Function: GET /record-procedure/devices/scan-device */
 router.get('/record-procedure/devices/scan-device', (req, res) => {
-  req.session.data.scannedDeviceCode = ''
+  req.session.data.currentOperationDevices ||= []
+  req.session.data.scannedDeviceCode ||= ''
+  req.session.data.scannedUdi ||= req.session.data.scannedDeviceCode
   req.session.data.deviceToConfirm = null
   res.render('record-procedure/devices/scan-device')
 })
 
 /* Function: POST /record-procedure/devices/scan-device */
 router.post('/record-procedure/devices/scan-device', (req, res) => {
+  req.session.data.currentOperationDevices ||= []
+
   const scanned = (req.body.scannedDeviceCode || req.body.scannedUdi || '').trim()
+
   req.session.data.scannedDeviceCode = scanned
+  req.session.data.scannedUdi = scanned
+
+  if (!scanned) {
+    req.session.data.deviceScanError = 'Enter the device barcode'
+    req.session.data.deviceToConfirm = null
+    return res.redirect('/record-procedure/devices/scan-device')
+  }
 
   const found = findDeviceByCode(scanned)
   req.session.data.deviceToConfirm = found
 
   if (!found) {
     req.session.data.deviceScanError = 'No device has been found with that barcode.'
+    req.session.data.deviceToConfirm = null
+    return res.redirect('/record-procedure/devices/scan-device')
+  }
+
+  const alreadyAdded = req.session.data.currentOperationDevices.some(
+    d => d.uniqueDeviceIdentifier === found.uniqueDeviceIdentifier
+  )
+
+  if (alreadyAdded) {
+    req.session.data.deviceScanError = 'This device has already been added'
+    req.session.data.deviceToConfirm = null
     return res.redirect('/record-procedure/devices/scan-device')
   }
 
@@ -524,6 +547,7 @@ router.post('/record-procedure/devices/confirm-device', (req, res) => {
 
   req.session.data.deviceToConfirm = null
   req.session.data.scannedDeviceCode = ''
+  req.session.data.scannedUdi = ''
 
   return res.redirect('/record-procedure/devices/add-devices')
 })
@@ -536,6 +560,8 @@ router.get('/record-procedure/devices/select-device', (req, res) => {
 
 /* Function: POST /record-procedure/devices/select-device */
 router.post('/record-procedure/devices/select-device', (req, res) => {
+  req.session.data.currentOperationDevices ||= []
+
   const selectedDeviceCode = (req.body.selectedDeviceCode || req.body.selectedUdi || '').trim()
   req.session.data.selectedDeviceCode = selectedDeviceCode
 
@@ -544,6 +570,16 @@ router.post('/record-procedure/devices/select-device', (req, res) => {
 
   if (!found) {
     req.session.data.deviceSelectError = 'Select a device'
+    return res.redirect('/record-procedure/devices/select-device')
+  }
+
+  const alreadyAdded = req.session.data.currentOperationDevices.some(
+    d => d.uniqueDeviceIdentifier === found.uniqueDeviceIdentifier
+  )
+
+  if (alreadyAdded) {
+    req.session.data.deviceSelectError = 'This device has already been added'
+    req.session.data.deviceToConfirm = null
     return res.redirect('/record-procedure/devices/select-device')
   }
 

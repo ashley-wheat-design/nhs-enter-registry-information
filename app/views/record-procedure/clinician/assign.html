@@ -1,0 +1,75 @@
+{% extends '../../layout.html' %}
+
+{% set pageName = "Assign role" %}
+{% set gmc = clinician.gmc or clinician.gmcNumber or clinician.registrationNumber %}
+
+{% block beforeContent %}
+<a class="nhsuk-back-link" href="/record-procedure/clinician/find">Back</a>
+{% endblock %}
+
+{% block content %}
+<div class="nhsuk-grid-row">
+  <div class="nhsuk-grid-column-two-thirds">
+
+    {% if data.clinicianLookupError %}
+      {{ errorSummary({
+        titleText: "There is a problem",
+        errorList: [
+          { text: data.clinicianLookupError, href: "#clinicianRole" }
+        ]
+      }) }}
+    {% endif %}
+
+    <h1 class="nhsuk-heading-xl">Assign a role</h1>
+
+    <div class="nhsuk-card">
+      <div class="nhsuk-card__content">
+        <h2 class="nhsuk-heading-m">{{ clinician.firstName }} {{ clinician.lastName }}</h2>
+        <p class="nhsuk-body">GMC {{ gmc }}</p>
+      </div>
+    </div>
+
+    <form class="form" action="/record-procedure/clinician/assign?gmc={{ gmc }}" method="post">
+
+      <div class="nhsuk-form-group {% if data.clinicianLookupError %}nhsuk-form-group--error{% endif %}">
+        <fieldset class="nhsuk-fieldset" aria-describedby="clinicianRole-hint">
+          <legend class="nhsuk-fieldset__legend nhsuk-fieldset__legend--m">
+            <h2 class="nhsuk-fieldset__heading">What role is this clinician?</h2>
+          </legend>
+
+          <div class="nhsuk-hint" id="clinicianRole-hint">
+            You can have 1 responsible consultant, 1 supervising surgeon and up to 4 lead surgeons.
+          </div>
+
+          {% if data.clinicianLookupError %}
+            <span class="nhsuk-error-message">
+              <span class="nhsuk-u-visually-hidden">Error:</span> {{ data.clinicianLookupError }}
+            </span>
+          {% endif %}
+
+          <div class="nhsuk-radios" id="clinicianRole">
+            <div class="nhsuk-radios__item">
+              <input class="nhsuk-radios__input" id="role-rc" name="clinicianRole" type="radio" value="responsible-consultant">
+              <label class="nhsuk-label nhsuk-radios__label" for="role-rc">Responsible consultant</label>
+            </div>
+
+            <div class="nhsuk-radios__item">
+              <input class="nhsuk-radios__input" id="role-ss" name="clinicianRole" type="radio" value="supervising-surgeon">
+              <label class="nhsuk-label nhsuk-radios__label" for="role-ss">Supervising surgeon</label>
+            </div>
+
+            <div class="nhsuk-radios__item">
+              <input class="nhsuk-radios__input" id="role-ls" name="clinicianRole" type="radio" value="operation-lead-surgeon">
+              <label class="nhsuk-label nhsuk-radios__label" for="role-ls">Lead surgeon</label>
+            </div>
+          </div>
+        </fieldset>
+      </div>
+
+      <button class="nhsuk-button" type="submit">Save and continue</button>
+
+    </form>
+
+  </div>
+</div>
+{% endblock %}

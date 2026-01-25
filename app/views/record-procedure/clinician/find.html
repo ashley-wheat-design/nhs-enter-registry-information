@@ -1,0 +1,51 @@
+{% extends '../../layout.html' %}
+
+{% set pageName = "Find clinician" %}
+{% set value = (data.clinicianSearch and data.clinicianSearch.query) or "" %}
+
+{% block beforeContent %}
+<a class="nhsuk-back-link" href="javascript:history.back()">Back</a>
+{% endblock %}
+
+{% block content %}
+<div class="nhsuk-grid-row">
+  <div class="nhsuk-grid-column-two-thirds">
+
+    {% if data.clinicianLookupError %}
+      {{ errorSummary({
+        titleText: "There is a problem",
+        errorList: [
+          { text: data.clinicianLookupError, href: "#clinicianSearch" }
+        ]
+      }) }}
+    {% endif %}
+
+    <form class="form" action="/record-procedure/clinician/find" method="post">
+
+      <div class="nhsuk-form-group {% if data.clinicianLookupError %}nhsuk-form-group--error{% endif %}">
+        <h1 class="nhsuk-heading-xl">Find a clinician</h1>
+
+        <label class="nhsuk-label" for="clinicianSearch">Search by name or GMC number</label>
+        <div class="nhsuk-hint" id="clinicianSearch-hint">For example, Sarah Patel or 7123456</div>
+
+        {% if data.clinicianLookupError %}
+          <span class="nhsuk-error-message">
+            <span class="nhsuk-u-visually-hidden">Error:</span> {{ data.clinicianLookupError }}
+          </span>
+        {% endif %}
+
+        <input class="nhsuk-input nhsuk-input--width-20"
+          id="clinicianSearch"
+          name="clinicianSearch"
+          type="text"
+          value="{{ value }}"
+          aria-describedby="clinicianSearch-hint">
+      </div>
+
+      <button class="nhsuk-button" type="submit">Search</button>
+
+    </form>
+
+  </div>
+</div>
+{% endblock %}

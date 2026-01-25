@@ -1,0 +1,36 @@
+{% extends '../../layout.html' %}
+
+{% set pageName = "Confirm clinician" %}
+{% set roleLabel = role | replace("-", " ") %}
+{% set gmc = clinician.gmc or clinician.gmcNumber or clinician.registrationNumber %}
+
+{% block beforeContent %}
+<a class="nhsuk-back-link" href="/record-procedure/clinician/{{ role }}/find">Back</a>
+{% endblock %}
+
+{% block content %}
+<div class="nhsuk-grid-row">
+  <div class="nhsuk-grid-column-two-thirds">
+
+    <h1 class="nhsuk-heading-xl">
+      Confirm {{ roleLabel }}
+    </h1>
+
+    <div class="nhsuk-card">
+      <div class="nhsuk-card__content">
+        <h2 class="nhsuk-heading-m">
+          {{ clinician.firstName }} {{ clinician.lastName }}
+        </h2>
+        <p class="nhsuk-body">
+          GMC {{ gmc }}
+        </p>
+      </div>
+    </div>
+
+    <form class="form" action="/record-procedure/clinician/{{ role }}/confirm?gmc={{ gmc }}" method="post">
+      <button class="nhsuk-button" type="submit">Confirm and continue</button>
+    </form>
+
+  </div>
+</div>
+{% endblock %}

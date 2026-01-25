@@ -12,7 +12,7 @@
 
     {% set devicesAdded = data.currentOperationDevices or [] %}
 
-    <h1 class="nhsuk-heading-l">Devices {{ data.operationOutcome + 'ed' }} ({{devicesAdded.length}})</h1>
+    <h1 class="nhsuk-heading-l">Devices ({{devicesAdded.length}})</h1>
 
     <form class="form" action="/record-procedure/devices/add-devices/add" method="post">
       <button class="nhsuk-button nhsuk-button--secondary" data-module="nhsuk-button" type="submit">
@@ -27,12 +27,19 @@
 
     {% else %}
     {% for d in devicesAdded %}
-    <div class="nhsuk-card">
+    <div class="nhsuk-card nhsuk-u-margin-bottom-4">
+      <div class="nhsuk-card__heading-container">
+    <h2 class="nhsuk-card__heading nhsuk-heading-s">
+      {{ d.medicalDeviceBrandOrModelName }}
+    </h2>
+    <ul class="nhsuk-card__actions">
+      <li class="nhsuk-card__action">
+        <a class="nhsuk-link" href="#">Remove<span class="nhsuk-u-visually-hidden"> (Karen Francis)</span></a>
+      </li>
+    </ul>
+  </div>
       <div class="nhsuk-card__content">
-        <h3 class="nhsuk-card__heading nhsuk-heading-s">
-          {{ d.medicalDeviceBrandOrModelName }}
-        </h3>
-        <p class="nhsuk-card__description nhsuk-u-margin-bottom-3">
+        <p class="nhsuk-card__description">
           {{ d.productDescription }}
         </p>
         <dl class="nhsuk-summary-list nhsuk-summary-list--no-border">
@@ -91,7 +98,7 @@
     {% endif %}
 
     <form class="form" action="/record-procedure/devices/add-devices" method="post">
-      <button class="nhsuk-button" data-module="nhsuk-button" type="submit">
+      <button class="nhsuk-button nhsuk-u-margin-top-3" data-module="nhsuk-button" type="submit">
         Finish adding devices
       </button>
     </form>

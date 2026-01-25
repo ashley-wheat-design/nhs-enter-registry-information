@@ -5,7 +5,6 @@
 {% set procedures = p.procedures or [] %}
 {% set latest = procedures[procedures.length - 1] %}
 
-{# In-progress (session) values #}
 {% set op = data.currentOperation or {} %}
 {% set diagnosisCodes = data.diagnosisCodes or [] %}
 {% set primaryCode = diagnosisCodes[0] %}
@@ -21,7 +20,6 @@
 {% set supervising = data.supervisingSurgeon %}
 {% set leadSurgeons = data.leadSurgeons or [] %}
 
-{# Fallback to latest saved procedure if in-progress values are missing #}
 {% if latest %}
   {% if not procDate %}{% set procDate = latest.date %}{% endif %}
   {% if not procTime %}{% set procTime = latest.time %}{% endif %}
@@ -268,37 +266,69 @@
 
           <div class="nhsuk-card">
             <div class="nhsuk-card__content">
-              {% set responsible = data.responsibleConsultant %}
-              {% set supervising = data.supervisingSurgeon %}
-              {% set leadSurgeons = data.leadSurgeons or [] %}
               <h3 class="nhsuk-card__heading">
                 Clinician details
               </h3>
+
               <dl class="nhsuk-summary-list nhsuk-summary-list--no-border">
+
                 <div class="nhsuk-summary-list__row">
                   <dt class="nhsuk-summary-list__key">
                     Operation responsible consultant
                   </dt>
                   <dd class="nhsuk-summary-list__value">
-
+                    {% if responsible %}
+                      {{ responsible.title }} {{ responsible.firstName }} {{ responsible.lastName }}<br>
+                      <span class="nhsuk-hint">GMC {{ responsible.gmc or responsible.gmcNumber or responsible.registrationNumber }}</span>
+                    {% else %}
+                      —
+                    {% endif %}
+                  </dd>
+                  <dd class="nhsuk-summary-list__actions">
+                    <a class="nhsuk-link" href="/record-procedure/clinician/clinicians-summary">Change<span class="nhsuk-u-visually-hidden"> operation responsible consultant</span></a>
                   </dd>
                 </div>
+
                 <div class="nhsuk-summary-list__row">
                   <dt class="nhsuk-summary-list__key">
                     Operation supervising surgeon
                   </dt>
                   <dd class="nhsuk-summary-list__value">
-
+                    {% if supervising %}
+                      {{ supervising.title }} {{ supervising.firstName }} {{ supervising.lastName }}<br>
+                      <span class="nhsuk-hint">GMC {{ supervising.gmc or supervising.gmcNumber or supervising.registrationNumber }}</span>
+                    {% else %}
+                      —
+                    {% endif %}
+                  </dd>
+                  <dd class="nhsuk-summary-list__actions">
+                    <a class="nhsuk-link" href="/record-procedure/clinician/clinicians-summary">Change<span class="nhsuk-u-visually-hidden"> operation supervising surgeon</span></a>
                   </dd>
                 </div>
+
                 <div class="nhsuk-summary-list__row">
                   <dt class="nhsuk-summary-list__key">
-                    Operation lead surgeons
+                    Operation lead surgeon{% if leadSurgeons.length != 1 %}s{% endif %}
                   </dt>
                   <dd class="nhsuk-summary-list__value">
-
+                    {% if leadSurgeons.length %}
+                      <ul class="nhsuk-list nhsuk-u-margin-bottom-0">
+                        {% for c in leadSurgeons %}
+                          <li>
+                            {{ c.title }} {{ c.firstName }} {{ c.lastName }}<br>
+                            <span class="nhsuk-hint">GMC {{ c.gmc or c.gmcNumber or c.registrationNumber }}</span>
+                          </li>
+                        {% endfor %}
+                      </ul>
+                    {% else %}
+                      —
+                    {% endif %}
+                  </dd>
+                  <dd class="nhsuk-summary-list__actions">
+                    <a class="nhsuk-link" href="/record-procedure/clinician/clinicians-summary">Change<span class="nhsuk-u-visually-hidden"> operation lead surgeons</span></a>
                   </dd>
                 </div>
+
               </dl>
             </div>
           </div>

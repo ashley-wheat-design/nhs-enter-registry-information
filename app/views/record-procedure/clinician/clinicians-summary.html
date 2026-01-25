@@ -16,6 +16,11 @@
     {% set supervising = data.supervisingSurgeon %}
     {% set leadSurgeons = data.leadSurgeons or [] %}
 
+    <a role="button" class="nhsuk-button nhsuk-button--secondary nhsuk-u-margin-bottom-6"
+      href="/record-procedure/clinician/find">
+      Add clinician
+    </a>
+
     <h2 class="nhsuk-heading-m">Operation responsible consultant</h2>
     {% if responsible %}
     <div class="nhsuk-card">
@@ -54,35 +59,34 @@
     <div class="nhsuk-inset-text nhsuk-u-margin-top-2 nhsuk-u-margin-bottom-4">
       <p class="nhsuk-body">You can add up to 4 operation lead surgeons.</p>
     </div>
+
     {% if leadSurgeons.length %}
-    {% for c in leadSurgeons %}
-    <div class="nhsuk-card nhsuk-u-margin-bottom-4">
-      <div class="nhsuk-card__content">
-        <h3 class="nhsuk-card__heading nhsuk-heading-s">
-          {{ c.title }} {{ c.firstName }} {{ c.lastName }}
-        </h3>
-        <p class="nhsuk-card__description">
-          {{ c.role }}<br>
-          <strong>GMC number:</strong> {{ c.gmc }}
-        </p>
+      {% for c in leadSurgeons %}
+      <div class="nhsuk-card nhsuk-u-margin-bottom-4">
+        <div class="nhsuk-card__content">
+          <h3 class="nhsuk-card__heading nhsuk-heading-s">
+            {{ c.title }} {{ c.firstName }} {{ c.lastName }}
+          </h3>
+          <p class="nhsuk-card__description">
+            {{ c.role }}<br>
+            <strong>GMC number:</strong> {{ c.gmc }}
+          </p>
+        </div>
       </div>
-    </div>
-    {% endfor %}
+      {% endfor %}
     {% else %}
-    <p class="nhsuk-body">No lead surgeons added yet.</p>
+      <p class="nhsuk-body">No lead surgeons added yet.</p>
     {% endif %}
 
-    {% if leadSurgeons.length < 4 %} {% else %} <p class="nhsuk-body">You have added the maximum of 4 operation lead
-      surgeons.</p>
-      {% endif %}
-      <a role="button" class="nhsuk-button nhsuk-button--secondary nhsuk-u-margin-top-2"
-        href="/record-procedure/clinician/operation-lead-surgeon">
-        Add another operation lead surgeon
-      </a>
-      <form class="form" action="/record-procedure/clinician/clinicians-summary" method="post">
-        <button class="nhsuk-button nhsuk-u-margin-top-6" data-module="nhsuk-button" type="submit">Confirm and
-          continue</button>
-      </form>
+    {% if leadSurgeons.length >= 4 %}
+      <p class="nhsuk-body">You have added the maximum of 4 operation lead surgeons.</p>
+    {% endif %}
+
+    <form class="form" action="/record-procedure/clinician/clinicians-summary" method="post">
+      <button class="nhsuk-button nhsuk-u-margin-top-6" data-module="nhsuk-button" type="submit">
+        Confirm and continue
+      </button>
+    </form>
 
   </div>
 </div>

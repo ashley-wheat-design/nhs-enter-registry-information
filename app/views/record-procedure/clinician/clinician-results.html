@@ -1,0 +1,59 @@
+{% extends '../../layout.html' %}
+
+{% set pageName = "Select clinician" %}
+{% set roleLabel = role | replace("-", " ") %}
+
+{% block beforeContent %}
+<a class="nhsuk-back-link" href="javascript:history.back()">Back</a>
+{% endblock %}
+
+{% block content %}
+<div class="nhsuk-grid-row">
+  <div class="nhsuk-grid-column-two-thirds">
+
+    {% if data.clinicianLookupError %}
+      {{ errorSummary({
+        titleText: "There is a problem",
+        errorList: [
+          { text: data.clinicianLookupError, href: "#selectedClinicianGmc" }
+        ]
+      }) }}
+    {% endif %}
+
+    <form class="form" action="/record-procedure/clinician/{{ role }}/results" method="post">
+      <div class="nhsuk-form-group {% if data.clinicianLookupError %}nhsuk-form-group--error{% endif %}">
+        <fieldset class="nhsuk-fieldset">
+          <legend class="nhsuk-fieldset__legend nhsuk-fieldset__legend--l">
+            <h1 class="nhsuk-fieldset__heading">
+              Select {{ roleLabel }}
+            </h1>
+          </legend>
+
+          {% if query %}
+            <div class="nhsuk-hint">Results for “{{ query }}”</div>
+          {% endif %}
+
+          <div class="nhsuk-radios" data-module="nhsuk-radios">
+            {% for clinician in results %}
+              <div class="nhsuk-radios__item">
+                <input class="nhsuk-radios__input" id="selectedClinicianGmc-{{ loop.index }}" name="selectedClinicianGmc" type="radio" value="{{ clinician.gmc or clinician.gmcNumber or clinician.registrationNumber }}" {% if loop.first %}aria-describedby="selectedClinicianGmc"{% endif %}>
+                <label class="nhsuk-label nhsuk-radios__label" for="selectedClinicianGmc-{{ loop.index }}">
+                  {{ clinician.title }} {{ clinician.firstName }} {{ clinician.lastName }}
+                </label>
+                <div class="nhsuk-hint nhsuk-radios__hint">
+                  {{ clinician.role }}<br>
+                  GMC {{ clinician.gmc or clinician.gmcNumber or clinician.registrationNumber }}
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+
+        </fieldset>
+      </div>
+
+      {{ button({ text: "Continue" }) }}
+    </form>
+
+  </div>
+</div>
+{% endblock %}

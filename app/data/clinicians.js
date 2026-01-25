@@ -1,5 +1,3 @@
-// /app/data/clinicians.js
-
 const clinicians = [
   {
     gmc: '1234567',
@@ -15,6 +13,8 @@ const clinicians = [
     lastName: 'Shaw',
     role: 'Anaesthetist'
   },
+
+  // Multiple Patels for demo
   {
     gmc: '3456789',
     title: 'Dr',
@@ -22,6 +22,28 @@ const clinicians = [
     lastName: 'Patel',
     role: 'Orthopaedic Surgeon'
   },
+  {
+    gmc: '4567801',
+    title: 'Dr',
+    firstName: 'Anita',
+    lastName: 'Patel',
+    role: 'General Surgeon'
+  },
+  {
+    gmc: '5678012',
+    title: 'Dr',
+    firstName: 'Sanjay',
+    lastName: 'Patel',
+    role: 'Consultant Anaesthetist'
+  },
+  {
+    gmc: 'C345678',
+    title: 'Mr',
+    firstName: 'Vikram',
+    lastName: 'Patel',
+    role: 'Consultant Trauma Surgeon'
+  },
+
   {
     gmc: '4567890',
     title: 'Dr',
@@ -76,10 +98,10 @@ const clinicians = [
   }
 ]
 
-function findClinicianByGmc(gmc) {
+function findClinicianByGmc (gmc) {
   if (!gmc) return null
   const normalised = gmc.trim().toUpperCase()
-  return clinicians.find(c => c.gmc.toUpperCase() === normalised)
+  return clinicians.find(c => String(c.gmc).toUpperCase() === normalised) || null
 }
 
 module.exports = {

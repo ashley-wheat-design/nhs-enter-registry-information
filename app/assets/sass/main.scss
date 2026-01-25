@@ -1,21 +1,19 @@
-// Import NHS.UK frontend library
 @import "nhsuk-frontend/dist/nhsuk";
 
-// Add your custom CSS/Sass styles below.
-.app-registry-bar {
+.app-registry-bar, .app-patient-bar {
   background-color: #fff;
   border-bottom: 1px solid $nhsuk-border-colour;
 }
 
-.app-registry-bar__content {
+.app-registry-bar__content, .app-patient-bar__content {
   padding: 16px 0;
 }
 
-.app-registry-bar__name {
+.app-registry-bar__name, .app-patient-bar__name {
   margin-left: nhsuk-spacing(1);
 }
 
-.app-registry-bar__change {
+.app-registry-bar__change, .app-patient-bar__change {
   margin-left: nhsuk-spacing(3);
 }
 

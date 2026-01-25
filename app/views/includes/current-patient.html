@@ -1,0 +1,16 @@
+{% if data.patientInfoComplete == true %}
+{% if (selectedPatient != '') %}
+{% set p = data.selectedPatient %}
+
+  <div class="app-patient-bar" role="region" aria-label="Current patient">
+    <div class="nhsuk-width-container">
+      <div class="app-patient-bar__content">
+        <p class="nhsuk-body-s nhsuk-u-margin-bottom-0">
+          <span class="nhsuk-u-margin-right-4"><strong>{{ p.firstName }} {{ p.lastName | upper }}</strong></span><span class="nhsuk-u-margin-right-4">Gender: <strong>{{ p.gender }}</strong></span><span class="nhsuk-u-margin-right-4">Date of birth:<strong>{{ p.dob }}</strong></span><span class="nhsuk-u-margin-right-4">NHS number: <strong>{{ p.nhsNumber }}</strong></span>
+        </p>
+   
+      </div>
+    </div>
+  </div>
+{% endif %}
+{% endif %}

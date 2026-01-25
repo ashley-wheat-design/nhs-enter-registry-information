@@ -1,0 +1,57 @@
+{% extends '../../layout.html' %}
+
+{% set pageName = "Select clinician" %}
+
+{% block beforeContent %}
+<a class="nhsuk-back-link" href="/record-procedure/clinician/find">Back</a>
+{% endblock %}
+
+{% block content %}
+<div class="nhsuk-grid-row">
+  <div class="nhsuk-grid-column-two-thirds">
+
+    {% if data.clinicianLookupError %}
+      {{ errorSummary({
+        titleText: "There is a problem",
+        errorList: [
+          { text: data.clinicianLookupError, href: "#selectedClinicianGmc" }
+        ]
+      }) }}
+    {% endif %}
+
+    <h1 class="nhsuk-heading-xl">Select a clinician</h1>
+
+    <form class="form" action="/record-procedure/clinician/results" method="post">
+
+      <div class="nhsuk-form-group {% if data.clinicianLookupError %}nhsuk-form-group--error{% endif %}">
+        {% if data.clinicianLookupError %}
+          <span class="nhsuk-error-message">
+            <span class="nhsuk-u-visually-hidden">Error:</span> {{ data.clinicianLookupError }}
+          </span>
+        {% endif %}
+
+        <div class="nhsuk-radios" id="selectedClinicianGmc">
+          {% for clinician in results %}
+            {% set gmc = clinician.gmc or clinician.gmcNumber or clinician.registrationNumber %}
+            <div class="nhsuk-radios__item">
+              <input class="nhsuk-radios__input"
+                id="clinician-{{ loop.index }}"
+                name="selectedClinicianGmc"
+                type="radio"
+                value="{{ gmc }}">
+              <label class="nhsuk-label nhsuk-radios__label" for="clinician-{{ loop.index }}">
+                {{ clinician.firstName }} {{ clinician.lastName }}
+              </label>
+              <div class="nhsuk-hint nhsuk-radios__hint">GMC {{ gmc }}</div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <button class="nhsuk-button" type="submit">Continue</button>
+
+    </form>
+
+  </div>
+</div>
+{% endblock %}

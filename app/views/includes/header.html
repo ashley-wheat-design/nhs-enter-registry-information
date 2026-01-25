@@ -2,31 +2,28 @@
   {{ currentOrganisation.name | truncate(30) }}
 {% endset %}
 
-{% set headerParams = {
-  service: {
-    text: serviceName,
-    href: "/"
-  },
-  account: {
-    items: [
-      {
-        href: "/user-profile",
-        text: (currentUser.firstName + " " + currentUser.lastName),
-        icon: true
-      } if currentUser,
-      {
-        html: organisationHtml
-      } if currentOrganisation,
-      {
-        href: "/sign-out",
-        text: "Log out"
-      }
-    ]
-  }
-} %}
-
-{% if noNavigation != true %}
-  {% set headerParams = headerParams | merge({
+{% if noNavigation != true and noAccount != true %}
+  {{ header({
+    service: {
+      text: serviceName,
+      href: "/"
+    },
+    account: {
+      items: [
+        {
+          href: "/user-profile",
+          text: (currentUser.firstName + " " + currentUser.lastName),
+          icon: true
+        } if currentUser,
+        {
+          html: organisationHtml
+        } if currentOrganisation,
+        {
+          href: "/sign-out",
+          text: "Log out"
+        }
+      ]
+    },
     navigation: {
       items: [
         { text: "Home", href: "#", active: currentSection == "home" },
@@ -36,7 +33,54 @@
         { text: "Reporting", href: "#", active: currentSection == "reporting" }
       ]
     }
-  }) %}
-{% endif %}
+  }) }}
 
-{{ header(headerParams) }}
+{% elseif noNavigation != true and noAccount == true %}
+  {{ header({
+    service: {
+      text: serviceName,
+      href: "/"
+    },
+    navigation: {
+      items: [
+        { text: "Home", href: "#", active: currentSection == "home" },
+        { text: "Record procedure", href: "/record-procedure", active: currentSection == "record-procedure" },
+        { text: "Find procedure", href: "#", active: currentSection == "find-treatment" },
+        { text: "Bulk upload", href: "#", active: currentSection == "bulk-upload" },
+        { text: "Reporting", href: "#", active: currentSection == "reporting" }
+      ]
+    },
+    account: {
+      items: [
+        {
+          href: "/user-profile",
+          text: (currentUser.firstName + " " + currentUser.lastName),
+          icon: true
+        } if currentUser,
+        {
+          html: organisationHtml
+        } if currentOrganisation,
+        {
+          href: "/sign-out",
+          text: "Log out"
+        }
+      ]
+    }
+  }) }}
+
+{% elseif noNavigation == true and noAccount != true %}
+  {{ header({
+    service: {
+      text: serviceName,
+      href: "/"
+    }
+  }) }}
+
+{% else %}
+  {{ header({
+    service: {
+      text: serviceName,
+      href: "/"
+    }
+  }) }}
+{% endif %}

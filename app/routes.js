@@ -1,5 +1,3 @@
-// app/routes.js
-
 const express = require('express')
 const router = express.Router()
 const icd10 = require('./data/icd10')
@@ -7,7 +5,132 @@ const asaPhysicalStatus = require('./data/asa-physical-status')
 const { clinicians, findClinicianByGmc } = require('./data/clinicians')
 const { devices, findDeviceByCode } = require('./data/devices')
 
-/* Function: session bootstrap */
+function normaliseSearchText (value) {
+  return String(value || '')
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, ' ')
+}
+
+function normaliseGmcNumber (value) {
+  return String(value || '')
+    .replace(/\D/g, '')
+    .trim()
+}
+
+function getClinicians (req) {
+  return (req.session.data && req.session.data.clinicians) ? req.session.data.clinicians : []
+}
+
+function clinicianFullName (c) {
+  const first = (c.firstName || '').trim()
+  const last = (c.lastName || '').trim()
+  const full = `${first} ${last}`.trim()
+  return full || (c.name || '').trim()
+}
+
+function clinicianMatchesNameQuery (clinician, query) {
+  const q = normaliseSearchText(query)
+  if (!q) return false
+
+  const full = normaliseSearchText(clinicianFullName(clinician))
+  const first = normaliseSearchText(clinician.firstName)
+  const last = normaliseSearchText(clinician.lastName)
+
+  const tokens = q.split(' ').filter(Boolean)
+
+  if (tokens.length === 1) {
+    return full.includes(tokens[0]) || first.includes(tokens[0]) || last.includes(tokens[0])
+  }
+
+  return tokens.every(t => full.includes(t))
+}
+
+function findClinicianByGmcLocal (cliniciansList, gmcNumber) {
+  const gmc = normaliseGmcNumber(gmcNumber)
+  if (!gmc) return null
+
+  return cliniciansList.find(c => normaliseGmcNumber(c.gmc || c.gmcNumber || c.registrationNumber) === gmc) || null
+}
+
+function findCliniciansByNameLocal (cliniciansList, nameQuery) {
+  const q = normaliseSearchText(nameQuery)
+  if (!q) return []
+
+  const results = cliniciansList
+    .filter(c => clinicianMatchesNameQuery(c, q))
+    .sort((a, b) => clinicianFullName(a).localeCompare(clinicianFullName(b)))
+
+  const seen = new Set()
+  const deduped = []
+
+  for (const c of results) {
+    const gmc = normaliseGmcNumber(c.gmc || c.gmcNumber || c.registrationNumber)
+    const key = gmc ? `gmc:${gmc}` : `name:${normaliseSearchText(clinicianFullName(c))}`
+    if (!seen.has(key)) {
+      seen.add(key)
+      deduped.push(c)
+    }
+  }
+
+  return deduped
+}
+
+function searchClinicians (req, rawQuery) {
+  const cliniciansList = getClinicians(req)
+  const raw = String(rawQuery || '').trim()
+
+  const gmc = normaliseGmcNumber(raw)
+  const q = normaliseSearchText(raw)
+
+  if (gmc) {
+    let match = null
+
+    try {
+      if (typeof findClinicianByGmc === 'function') {
+        match = findClinicianByGmc(gmc)
+      }
+    } catch (e) {
+      match = null
+    }
+
+    if (!match) match = findClinicianByGmcLocal(cliniciansList, gmc)
+
+    if (match) return { mode: 'gmc', query: gmc, results: [match] }
+    return { mode: 'gmc', query: gmc, results: [] }
+  }
+
+  if (q) return { mode: 'name', query: q, results: findCliniciansByNameLocal(cliniciansList, q) }
+
+  return { mode: 'none', query: '', results: [] }
+}
+
+function setClinicianForRole (req, role, clinician) {
+  req.session.data.selectedClinicians ||= {}
+  req.session.data.selectedClinicians[role] = clinician
+
+  const gmc = clinician ? (clinician.gmc || clinician.gmcNumber || clinician.registrationNumber || '') : ''
+
+  if (role === 'responsible-consultant') {
+    req.session.data.responsibleConsultant = clinician
+    req.session.data.responsibleConsultantGmc = gmc
+  }
+
+  if (role === 'supervising-surgeon') {
+    req.session.data.supervisingSurgeon = clinician
+    req.session.data.supervisingSurgeonGmc = gmc
+  }
+
+  if (role === 'operation-lead-surgeon') {
+    req.session.data.leadSurgeons ||= []
+    if (clinician && req.session.data.leadSurgeons.length < 4) {
+      const g = normaliseGmcNumber(gmc)
+      const already = req.session.data.leadSurgeons.some(c => normaliseGmcNumber(c.gmc || c.gmcNumber || c.registrationNumber) === g)
+      if (!already) req.session.data.leadSurgeons.push(clinician)
+    }
+  }
+}
+
 router.use((req, res, next) => {
   req.session.data ||= {}
 
@@ -45,36 +168,30 @@ router.use((req, res, next) => {
   next()
 })
 
-/* Function: GET /record-procedure */
 router.get('/record-procedure', (req, res) => {
   delete req.session.data.nhsNumber
   delete req.session.data.selectedPatient
   res.render('record-procedure/barcode-scanner')
 })
 
-/* Function: POST /scanner-answer */
 router.post('/scanner-answer', (req, res) => {
   req.session.data.hasScanner = req.body.hasScanner === 'yes'
-  res.redirect('record-procedure/task-list')
+  res.redirect('/record-procedure/task-list')
 })
 
-/* Function: GET /record-procedure/patient/has-nhs-number */
 router.get('/record-procedure/patient/has-nhs-number', (req, res) => {
   res.render('record-procedure/patient/has-nhs-number')
 })
 
-/* Function: POST /has-nhs-number-answer */
 router.post('/has-nhs-number-answer', (req, res) => {
   if (req.body.hasNHSNumber === 'yes') return res.redirect('/record-procedure/patient/nhs-number')
   return res.redirect('/record-procedure/patient/patient-search')
 })
 
-/* Function: GET /record-procedure/patient/nhs-number */
 router.get('/record-procedure/patient/nhs-number', (req, res) => {
   res.render('record-procedure/patient/nhs-number')
 })
 
-/* Function: POST /nhs-number-answer */
 router.post('/nhs-number-answer', (req, res) => {
   const raw = req.body.nhsNumber || ''
   const nhsNumber = raw.replace(/\s/g, '')
@@ -99,25 +216,21 @@ router.post('/nhs-number-answer', (req, res) => {
   return res.redirect('/record-procedure/patient/confirm-patient')
 })
 
-/* Function: GET /record-procedure/patient/confirm-patient */
 router.get('/record-procedure/patient/confirm-patient', (req, res) => {
   if (!req.session.data.selectedPatient) return res.redirect('/record-procedure/patient/nhs-number')
   res.render('record-procedure/patient/confirm-patient')
 })
 
-/* Function: POST /record-procedure/patient/patient-information-complete */
 router.post('/record-procedure/patient/patient-information-complete', (req, res) => {
   req.session.data.patientInfoComplete = true
   return res.redirect('/record-procedure/task-list')
 })
 
-/* Function: GET /record-procedure/patient/enter-weight */
 router.get('/record-procedure/patient/enter-weight', (req, res) => {
   if (!req.session.data.selectedPatient) return res.redirect('/record-procedure/patient/nhs-number')
   res.render('record-procedure/patient/enter-weight')
 })
 
-/* Function: POST /record-procedure/patient/enter-weight */
 router.post('/record-procedure/patient/enter-weight', (req, res) => {
   const raw = (req.body.weight || '').trim()
 
@@ -128,13 +241,11 @@ router.post('/record-procedure/patient/enter-weight', (req, res) => {
   res.redirect('/record-procedure/patient/confirm-patient')
 })
 
-/* Function: GET /record-procedure/patient/enter-height */
 router.get('/record-procedure/patient/enter-height', (req, res) => {
   if (!req.session.data.selectedPatient) return res.redirect('/record-procedure/patient/nhs-number')
   res.render('record-procedure/patient/enter-height')
 })
 
-/* Function: POST /record-procedure/patient/enter-height */
 router.post('/record-procedure/patient/enter-height', (req, res) => {
   const raw = (req.body.height || '').trim()
 
@@ -145,13 +256,11 @@ router.post('/record-procedure/patient/enter-height', (req, res) => {
   res.redirect('/record-procedure/patient/confirm-patient')
 })
 
-/* Function: GET /record-procedure/patient/enter-email */
 router.get('/record-procedure/patient/enter-email', (req, res) => {
   if (!req.session.data.selectedPatient) return res.redirect('/record-procedure/patient/nhs-number')
   res.render('record-procedure/patient/enter-email')
 })
 
-/* Function: POST /record-procedure/patient/enter-email */
 router.post('/record-procedure/patient/enter-email', (req, res) => {
   const email = req.body.emailAddress
 
@@ -162,7 +271,6 @@ router.post('/record-procedure/patient/enter-email', (req, res) => {
   res.redirect('/record-procedure/patient/confirm-patient')
 })
 
-/* Function: POST /record-procedure/procedure/procedure-date */
 router.post('/record-procedure/procedure/procedure-date', (req, res) => {
   const procedureDateToday = req.body.procedureDateToday
 
@@ -200,7 +308,6 @@ router.post('/record-procedure/procedure/procedure-date', (req, res) => {
   return res.redirect('/record-procedure/procedure/procedure-time')
 })
 
-/* Function: POST /record-procedure/procedure/procedure-time */
 router.post('/record-procedure/procedure/procedure-time', (req, res) => {
   let procedureTime = (req.body.procedureTime || '').trim()
 
@@ -219,7 +326,6 @@ router.post('/record-procedure/procedure/procedure-time', (req, res) => {
   res.redirect('/record-procedure/procedure/primary-diagnosis')
 })
 
-/* Function: POST /record-procedure/procedure/primary-diagnosis */
 router.post('/record-procedure/procedure/primary-diagnosis', (req, res) => {
   const code = req.body.primaryDiagnosisCode
 
@@ -232,12 +338,10 @@ router.post('/record-procedure/procedure/primary-diagnosis', (req, res) => {
   return res.redirect('/record-procedure/procedure/diagnosis-summary')
 })
 
-/* Function: GET /record-procedure/procedure/add-diagnosis */
 router.get('/record-procedure/procedure/add-diagnosis', (req, res) => {
   res.render('record-procedure/procedure/add-diagnosis')
 })
 
-/* Function: POST /record-procedure/procedure/add-diagnosis */
 router.post('/record-procedure/procedure/add-diagnosis', (req, res) => {
   const code = req.body.diagnosisCode
 
@@ -259,7 +363,6 @@ router.post('/record-procedure/procedure/add-diagnosis', (req, res) => {
   return res.redirect('/record-procedure/procedure/diagnosis-summary')
 })
 
-/* Function: POST /record-procedure/procedure/physical-status */
 router.post('/record-procedure/procedure/physical-status', (req, res) => {
   const asa = req.body.asaClassification
 
@@ -276,7 +379,6 @@ router.post('/record-procedure/procedure/physical-status', (req, res) => {
   return res.redirect('/record-procedure/procedure/operation-details')
 })
 
-/* Function: POST /record-procedure/procedure/operation-details */
 router.post('/record-procedure/procedure/operation-details', (req, res) => {
   req.session.data.currentOperation ||= {}
 
@@ -287,12 +389,10 @@ router.post('/record-procedure/procedure/operation-details', (req, res) => {
   return res.redirect('/record-procedure/procedure/operation-summary')
 })
 
-/* Function: GET /record-procedure/procedure/operation-summary */
 router.get('/record-procedure/procedure/operation-summary', (req, res) => {
   res.render('record-procedure/procedure/operation-summary')
 })
 
-/* Function: POST /record-procedure/procedure/confirm */
 router.post('/record-procedure/procedure/confirm', (req, res) => {
   const patient = req.session.data.selectedPatient
   if (!patient) {
@@ -336,133 +436,136 @@ router.post('/record-procedure/procedure/confirm', (req, res) => {
   return res.redirect('/record-procedure/task-list')
 })
 
-/* Function: GET /record-procedure/clinician/responsible-consultant */
-router.get('/record-procedure/clinician/responsible-consultant', (req, res) => {
-  res.render('record-procedure/clinician/responsible-consultant')
+router.get('/record-procedure/clinician/find', (req, res) => {
+  const err = String(req.query.err || '').trim()
+  const q = String(req.query.q || '').trim()
+
+  req.session.data.clinicianSearch ||= { query: '', mode: 'none', results: [] }
+  if (q) req.session.data.clinicianSearch.query = q
+
+  if (err === 'empty') req.session.data.clinicianLookupError = 'Enter a name or GMC number'
+  else if (err === 'notfound') req.session.data.clinicianLookupError = 'We could not find a clinician with those details'
+  else delete req.session.data.clinicianLookupError
+
+  res.render('record-procedure/clinician/find')
 })
 
-/* Function: POST /record-procedure/clinician/responsible-consultant */
-router.post('/record-procedure/clinician/responsible-consultant', (req, res) => {
-  const gmc = (req.session.data.responsibleConsultantGmc || '').trim()
-  req.session.data.responsibleConsultant = findClinicianByGmc(gmc)
+router.post('/record-procedure/clinician/find', (req, res) => {
+  const raw = String((req.body && req.body.clinicianSearch) || '').trim()
+  const search = searchClinicians(req, raw)
 
-  if (!req.session.data.responsibleConsultant) {
-    req.session.data.clinicianLookupError = 'We could not find a clinician with that GMC number'
-    return res.redirect('/record-procedure/clinician/responsible-consultant')
+  req.session.data.clinicianSearch = {
+    query: raw,
+    mode: search.mode,
+    results: search.results
+  }
+
+  if (search.mode === 'none') return res.redirect('/record-procedure/clinician/find?err=empty')
+  if (search.results.length === 1) {
+    const one = search.results[0]
+    const gmc = normaliseGmcNumber(one.gmc || one.gmcNumber || one.registrationNumber || '')
+    return res.redirect(`/record-procedure/clinician/assign?gmc=${encodeURIComponent(gmc)}&q=${encodeURIComponent(raw)}`)
+  }
+  if (search.results.length > 1) return res.redirect(`/record-procedure/clinician/results?q=${encodeURIComponent(raw)}`)
+  return res.redirect(`/record-procedure/clinician/find?err=notfound&q=${encodeURIComponent(raw)}`)
+})
+
+router.get('/record-procedure/clinician/results', (req, res) => {
+  const q = String(req.query.q || '').trim()
+
+  let search = req.session.data.clinicianSearch
+
+  if ((!search || !Array.isArray(search.results) || search.results.length < 2) && q) {
+    const rebuilt = searchClinicians(req, q)
+    req.session.data.clinicianSearch = {
+      query: q,
+      mode: rebuilt.mode,
+      results: rebuilt.results
+    }
+    search = req.session.data.clinicianSearch
+
+    if (rebuilt.results.length === 1) {
+      const one = rebuilt.results[0]
+      const gmc = normaliseGmcNumber(one.gmc || one.gmcNumber || one.registrationNumber || '')
+      return res.redirect(`/record-procedure/clinician/assign?gmc=${encodeURIComponent(gmc)}&q=${encodeURIComponent(q)}`)
+    }
+
+    if (rebuilt.results.length === 0) {
+      return res.redirect(`/record-procedure/clinician/find?err=notfound&q=${encodeURIComponent(q)}`)
+    }
+  }
+
+  if (!search || !Array.isArray(search.results) || search.results.length < 2) {
+    return res.redirect('/record-procedure/clinician/find')
   }
 
   delete req.session.data.clinicianLookupError
-  return res.redirect('/record-procedure/clinician/confirm-responsible-consultant')
+
+  res.render('record-procedure/clinician/results', {
+    query: search.query,
+    results: search.results
+  })
 })
 
-/* Function: GET /record-procedure/clinician/confirm-responsible-consultant */
-router.get('/record-procedure/clinician/confirm-responsible-consultant', (req, res) => {
-  res.render('record-procedure/clinician/confirm-responsible-consultant')
-})
+router.post('/record-procedure/clinician/results', (req, res) => {
+  const search = req.session.data.clinicianSearch
+  const selectedGmc = normaliseGmcNumber(req.body.selectedClinicianGmc || '')
 
-/* Function: POST /record-procedure/clinician/confirm-responsible-consultant */
-router.post('/record-procedure/clinician/confirm-responsible-consultant', (req, res) => {
-  res.redirect('/record-procedure/clinician/supervising-surgeon')
-})
-
-/* Function: GET /record-procedure/clinician/supervising-surgeon */
-router.get('/record-procedure/clinician/supervising-surgeon', (req, res) => {
-  res.render('record-procedure/clinician/supervising-surgeon')
-})
-
-/* Function: POST /record-procedure/clinician/supervising-surgeon */
-router.post('/record-procedure/clinician/supervising-surgeon', (req, res) => {
-  const gmc = (req.session.data.supervisingSurgeonGmc || '').trim()
-  req.session.data.supervisingSurgeon = findClinicianByGmc(gmc)
-
-  if (!req.session.data.supervisingSurgeon) {
-    req.session.data.clinicianLookupError = 'We could not find a clinician with that GMC number'
-    return res.redirect('/record-procedure/clinician/supervising-surgeon')
+  if (!selectedGmc) {
+    req.session.data.clinicianLookupError = 'Select a clinician'
+    return res.redirect(`/record-procedure/clinician/results?q=${encodeURIComponent((search && search.query) || '')}`)
   }
+
+  return res.redirect(`/record-procedure/clinician/assign?gmc=${encodeURIComponent(selectedGmc)}&q=${encodeURIComponent((search && search.query) || '')}`)
+})
+
+router.get('/record-procedure/clinician/assign', (req, res) => {
+  const gmc = normaliseGmcNumber(req.query.gmc || '')
+  const q = String(req.query.q || '').trim()
+
+  if (!gmc) return res.redirect('/record-procedure/clinician/find')
+
+  const clinician = findClinicianByGmcLocal(getClinicians(req), gmc)
+  if (!clinician) return res.redirect(`/record-procedure/clinician/find?err=notfound&q=${encodeURIComponent(q)}`)
 
   delete req.session.data.clinicianLookupError
-  return res.redirect('/record-procedure/clinician/confirm-supervising-surgeon')
+
+  res.render('record-procedure/clinician/assign', { clinician })
 })
 
-/* Function: GET /record-procedure/clinician/confirm-supervising-surgeon */
-router.get('/record-procedure/clinician/confirm-supervising-surgeon', (req, res) => {
-  res.render('record-procedure/clinician/confirm-supervising-surgeon')
-})
+router.post('/record-procedure/clinician/assign', (req, res) => {
+  const gmc = normaliseGmcNumber(req.query.gmc || req.body.gmc || '')
+  const role = String(req.body.clinicianRole || '').trim()
 
-/* Function: POST /record-procedure/clinician/confirm-supervising-surgeon */
-router.post('/record-procedure/clinician/confirm-supervising-surgeon', (req, res) => {
-  res.redirect('/record-procedure/clinician/operation-lead-surgeon')
-})
+  if (!gmc) return res.redirect('/record-procedure/clinician/find')
 
-/* Function: GET /record-procedure/clinician/operation-lead-surgeon */
-router.get('/record-procedure/clinician/operation-lead-surgeon', (req, res) => {
-  req.session.data.leadSurgeons ||= []
-  res.render('record-procedure/clinician/operation-lead-surgeon')
-})
+  const clinician = findClinicianByGmcLocal(getClinicians(req), gmc)
+  if (!clinician) return res.redirect('/record-procedure/clinician/find?err=notfound')
 
-/* Function: POST /record-procedure/clinician/operation-lead-surgeon */
-router.post('/record-procedure/clinician/operation-lead-surgeon', (req, res) => {
-  const gmc = (req.session.data.leadSurgeonGmc || '').trim()
-  req.session.data.leadSurgeon = findClinicianByGmc(gmc)
-
-  if (!req.session.data.leadSurgeon) {
-    req.session.data.clinicianLookupError = 'We could not find a clinician with that GMC number'
-    return res.redirect('/record-procedure/clinician/operation-lead-surgeon')
+  if (!role) {
+    req.session.data.clinicianLookupError = 'Select a role'
+    return res.redirect(`/record-procedure/clinician/assign?gmc=${encodeURIComponent(gmc)}`)
   }
 
-  delete req.session.data.clinicianLookupError
-  return res.redirect('/record-procedure/clinician/confirm-operation-lead-surgeon')
-})
-
-/* Function: GET /record-procedure/clinician/confirm-operation-lead-surgeon */
-router.get('/record-procedure/clinician/confirm-operation-lead-surgeon', (req, res) => {
-  req.session.data.leadSurgeons ||= []
-  res.render('record-procedure/clinician/confirm-operation-lead-surgeon')
-})
-
-/* Function: POST /record-procedure/clinician/confirm-operation-lead-surgeon */
-router.post('/record-procedure/clinician/confirm-operation-lead-surgeon', (req, res) => {
-  req.session.data.leadSurgeons ||= []
-
-  if (req.session.data.leadSurgeon && req.session.data.leadSurgeons.length < 4) {
-    req.session.data.leadSurgeons.push(req.session.data.leadSurgeon)
-  }
-
-  req.session.data.leadSurgeonGmc = ''
-  req.session.data.leadSurgeon = null
-
+  setClinicianForRole(req, role, clinician)
   return res.redirect('/record-procedure/clinician/clinicians-summary')
 })
 
-/* Function: GET /record-procedure/clinician/clinicians-summary */
 router.get('/record-procedure/clinician/clinicians-summary', (req, res) => {
   req.session.data.leadSurgeons ||= []
   res.render('record-procedure/clinician/clinicians-summary')
 })
 
-/* Function: POST /record-procedure/clinician/clinicians-summary */
 router.post('/record-procedure/clinician/clinicians-summary', (req, res) => {
   req.session.data.clinicianDetailsComplete = true
   return res.redirect('/record-procedure/task-list')
 })
 
-/* Function: GET /record-procedure/clinician/add-another-operation-lead-surgeon */
-router.get('/record-procedure/clinician/add-another-operation-lead-surgeon', (req, res) => {
-  return res.redirect('/record-procedure/clinician/clinicians-summary')
-})
-
-/* Function: POST /record-procedure/clinician/add-another-operation-lead-surgeon */
-router.post('/record-procedure/clinician/add-another-operation-lead-surgeon', (req, res) => {
-  return res.redirect('/record-procedure/clinician/clinicians-summary')
-})
-
-/* Function: GET /record-procedure/devices/add-devices */
 router.get('/record-procedure/devices/add-devices', (req, res) => {
   req.session.data.currentOperationDevices ||= []
   res.render('record-procedure/devices/add-devices')
 })
 
-/* Function: POST /record-procedure/devices/add-devices/add */
 router.post('/record-procedure/devices/add-devices/add', (req, res) => {
   req.session.data.currentOperationDevices ||= []
 
@@ -473,7 +576,6 @@ router.post('/record-procedure/devices/add-devices/add', (req, res) => {
   return res.redirect('/record-procedure/devices/select-device')
 })
 
-/* Function: GET /record-procedure/devices/scan-device */
 router.get('/record-procedure/devices/scan-device', (req, res) => {
   req.session.data.currentOperationDevices ||= []
   req.session.data.scannedDeviceCode ||= ''
@@ -482,7 +584,6 @@ router.get('/record-procedure/devices/scan-device', (req, res) => {
   res.render('record-procedure/devices/scan-device')
 })
 
-/* Function: POST /record-procedure/devices/scan-device */
 router.post('/record-procedure/devices/scan-device', (req, res) => {
   req.session.data.currentOperationDevices ||= []
 
@@ -511,7 +612,7 @@ router.post('/record-procedure/devices/scan-device', (req, res) => {
   )
 
   if (alreadyAdded) {
-    req.session.data.deviceScanError = 'This device has already been added'
+    req.session.data.deviceScanError = 'Scan a different device.'
     req.session.data.deviceToConfirm = null
     return res.redirect('/record-procedure/devices/scan-device')
   }
@@ -520,7 +621,6 @@ router.post('/record-procedure/devices/scan-device', (req, res) => {
   return res.redirect('/record-procedure/devices/confirm-device')
 })
 
-/* Function: GET /record-procedure/devices/confirm-device */
 router.get('/record-procedure/devices/confirm-device', (req, res) => {
   if (!req.session.data.deviceToConfirm) {
     return res.redirect('/record-procedure/devices/add-devices')
@@ -529,7 +629,6 @@ router.get('/record-procedure/devices/confirm-device', (req, res) => {
   res.render('record-procedure/devices/confirm-device')
 })
 
-/* Function: POST /record-procedure/devices/confirm-device */
 router.post('/record-procedure/devices/confirm-device', (req, res) => {
   req.session.data.currentOperationDevices ||= []
 
@@ -552,13 +651,11 @@ router.post('/record-procedure/devices/confirm-device', (req, res) => {
   return res.redirect('/record-procedure/devices/add-devices')
 })
 
-/* Function: GET /record-procedure/devices/select-device */
 router.get('/record-procedure/devices/select-device', (req, res) => {
   req.session.data.deviceToConfirm = null
   res.render('record-procedure/devices/select-device')
 })
 
-/* Function: POST /record-procedure/devices/select-device */
 router.post('/record-procedure/devices/select-device', (req, res) => {
   req.session.data.currentOperationDevices ||= []
 
@@ -587,7 +684,6 @@ router.post('/record-procedure/devices/select-device', (req, res) => {
   return res.redirect('/record-procedure/devices/confirm-device')
 })
 
-/* Function: POST /record-procedure/devices/add-devices */
 router.post('/record-procedure/devices/add-devices', (req, res) => {
   req.session.data.deviceDetailsComplete = true
   return res.redirect('/record-procedure/task-list')

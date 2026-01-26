@@ -57,7 +57,7 @@
             </h1>
           </legend>
 
-          <div class="nhsuk-card">
+          <div class="nhsuk-card nhsuk-u-margin-top-6">
             <div class="nhsuk-card__content">
               <h3 class="nhsuk-card__heading">Patient details</h3>
 
@@ -279,7 +279,7 @@
                   <dd class="nhsuk-summary-list__value">
                     {% if responsible %}
                       {{ responsible.title }} {{ responsible.firstName }} {{ responsible.lastName }}<br>
-                      <span class="nhsuk-hint">GMC {{ responsible.gmc or responsible.gmcNumber or responsible.registrationNumber }}</span>
+                      <span class="nhsuk-hint">GMC number: {{ responsible.gmc or responsible.gmcNumber or responsible.registrationNumber }}</span>
                     {% else %}
                       —
                     {% endif %}
@@ -296,7 +296,7 @@
                   <dd class="nhsuk-summary-list__value">
                     {% if supervising %}
                       {{ supervising.title }} {{ supervising.firstName }} {{ supervising.lastName }}<br>
-                      <span class="nhsuk-hint">GMC {{ supervising.gmc or supervising.gmcNumber or supervising.registrationNumber }}</span>
+                      <span class="nhsuk-hint">GMC number: {{ supervising.gmc or supervising.gmcNumber or supervising.registrationNumber }}</span>
                     {% else %}
                       —
                     {% endif %}
@@ -316,7 +316,7 @@
                         {% for c in leadSurgeons %}
                           <li>
                             {{ c.title }} {{ c.firstName }} {{ c.lastName }}<br>
-                            <span class="nhsuk-hint">GMC {{ c.gmc or c.gmcNumber or c.registrationNumber }}</span>
+                            <span class="nhsuk-hint">GMC number: {{ c.gmc or c.gmcNumber or c.registrationNumber }}</span>
                           </li>
                         {% endfor %}
                       </ul>

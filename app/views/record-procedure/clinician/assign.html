@@ -24,8 +24,9 @@
 
     <div class="nhsuk-card">
       <div class="nhsuk-card__content">
-        <h2 class="nhsuk-heading-m">{{ clinician.firstName }} {{ clinician.lastName }}</h2>
-        <p class="nhsuk-body">GMC {{ gmc }}</p>
+        <h2 class="nhsuk-heading-m nhsuk-u-margin-bottom-2">{{ clinician.firstName }} {{ clinician.lastName }}</h2>
+        <div class="nhsuk-hint">{{ clinician.role }}</div>
+        <p class="nhsuk-body"><strong>GMC number:</strong> {{ clinician.gmc or clinician.gmcNumber or clinician.registrationNumber }}</p>
       </div>
     </div>
 
@@ -36,10 +37,6 @@
           <legend class="nhsuk-fieldset__legend nhsuk-fieldset__legend--m">
             <h2 class="nhsuk-fieldset__heading">What role is this clinician?</h2>
           </legend>
-
-          <div class="nhsuk-hint" id="clinicianRole-hint">
-            You can have 1 responsible consultant, 1 supervising surgeon and up to 4 lead surgeons.
-          </div>
 
           {% if data.clinicianLookupError %}
             <span class="nhsuk-error-message">

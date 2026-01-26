@@ -15,8 +15,9 @@
 
     <div class="nhsuk-card">
       <div class="nhsuk-card__content">
-        <h2 class="nhsuk-heading-m">{{ clinician.title }} {{ clinician.firstName }} {{ clinician.lastName }}</h2>
-        <p class="nhsuk-body">{{ clinician.role }}<br><strong>GMC number:</strong> {{ clinician.gmc or clinician.gmcNumber or clinician.registrationNumber }}</p>
+        <h2 class="nhsuk-heading-m nhsuk-u-margin-bottom-2">{{ clinician.firstName }} {{ clinician.lastName }}</h2>
+        <div class="nhsuk-hint">{{ clinician.role }}</div>
+        <p class="nhsuk-body"><strong>GMC number:</strong> {{ clinician.gmc or clinician.gmcNumber or clinician.registrationNumber }}</p>
       </div>
     </div>
 

@@ -23,7 +23,7 @@
   "dependencies": {
     "@babel/core": "^7.28.4",
     "@babel/preset-env": "^7.28.5",
-    "@inquirer/prompts": "^7.9.0",
+    "@inquirer/prompts": "^8.2.0",
     "accessible-autocomplete": "^3.0.1",
     "body-parser": "^2.2.1",
     "browser-sync": "^3.0.4",

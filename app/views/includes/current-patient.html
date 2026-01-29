@@ -1,6 +1,7 @@
-{% if data.patientInfoComplete == true %}
+{% if (data.patientInfoComplete == true) or (data.journey == "singlePatientView") %}
 {% if (selectedPatient != '') %}
 {% set p = data.selectedPatient %}
+{% if showPatientInfo != false %}
 
   <div class="app-patient-bar" role="region" aria-label="Current patient">
     <div class="nhsuk-width-container">
@@ -12,5 +13,6 @@
       </div>
     </div>
   </div>
+{% endif %}
 {% endif %}
 {% endif %}

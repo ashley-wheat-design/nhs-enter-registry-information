@@ -131,6 +131,49 @@ function setClinicianForRole (req, role, clinician) {
   }
 }
 
+function getIcd10Label (code) {
+  if (!code) return null
+  return icd10[String(code).trim()] || null
+}
+
+function getLateralityLabel (code) {
+  const map = {
+    L: 'Left',
+    R: 'Right',
+    B: 'Both sides',
+    M: 'Midline',
+    '8': 'Not applicable',
+    '9': 'Unknown'
+  }
+
+  return map[String(code)] || 'Unknown'
+}
+
+function getAsaLabel (value) {
+  const map = {
+    '1': 'ASA 1 – A normal healthy patient',
+    '2': 'ASA 2 – A patient with mild systemic disease',
+    '3': 'ASA 3 – A patient with severe systemic disease',
+    '4': 'ASA 4 – A patient with severe systemic disease that is a constant threat to life',
+    '5': 'ASA 5 – A moribund patient who is not expected to survive without the operation',
+    '6': 'ASA 6 – A declared brain-dead patient whose organs are being removed for donor purposes'
+  }
+
+  return map[String(value)] || 'Unknown ASA status'
+}
+
+function formatDate (isoDate) {
+  if (!isoDate) return null
+
+  const date = new Date(isoDate)
+  return date.toLocaleDateString('en-GB', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  })
+}
+
+
 router.use((req, res, next) => {
   req.session.data ||= {}
 
@@ -164,19 +207,30 @@ router.use((req, res, next) => {
   res.locals.currentRegistry = req.session.data.currentRegistry
   res.locals.icd10 = icd10
   res.locals.asaPhysicalStatus = asaPhysicalStatus
+  res.locals.getIcd10Label = getIcd10Label
+  res.locals.getLateralityLabel = getLateralityLabel
+  res.locals.getAsaLabel = getAsaLabel
+  res.locals.formatDate = formatDate
+
 
   next()
 })
 
 router.get('/record-procedure', (req, res) => {
-  delete req.session.data.nhsNumber
-  delete req.session.data.selectedPatient
-  res.render('record-procedure/barcode-scanner')
+//   delete req.session.data.nhsNumber
+//   delete req.session.data.selectedPatient
+  res.render('record-procedure/task-list')
 })
 
 router.post('/scanner-answer', (req, res) => {
   req.session.data.hasScanner = req.body.hasScanner === 'yes'
-  res.redirect('/record-procedure/task-list')
+  const journey = req.session.data.journey
+  if(journey == "singlePatientView") {
+    return res.redirect('record-procedure/patient/has-nhs-number')
+  } 
+  else if (journey == "addProcedure"){
+    return res.redirect('/record-procedure/task-list')
+  }
 })
 
 router.get('/record-procedure/patient/has-nhs-number', (req, res) => {
@@ -222,8 +276,16 @@ router.get('/record-procedure/patient/confirm-patient', (req, res) => {
 })
 
 router.post('/record-procedure/patient/patient-information-complete', (req, res) => {
-  req.session.data.patientInfoComplete = true
+
+const journey = req.session.data.journey
+
+  if(journey == "singlePatientView"){
+    return res.redirect('/patient-profile/')
+  } 
+  else if (journey == "addProcedure") {
+    req.session.data.patientInfoComplete = true
   return res.redirect('/record-procedure/task-list')
+  }
 })
 
 router.get('/record-procedure/patient/enter-weight', (req, res) => {
@@ -687,6 +749,64 @@ router.post('/record-procedure/devices/select-device', (req, res) => {
 router.post('/record-procedure/devices/add-devices', (req, res) => {
   req.session.data.deviceDetailsComplete = true
   return res.redirect('/record-procedure/task-list')
+})
+
+function normaliseProcedureDate (value) {
+  const v = String(value || '').trim()
+  if (!v) return null
+
+  if (/^\d{4}-\d{2}-\d{2}$/.test(v)) return v
+
+  const m = v.match(/^(\d{2})\/(\d{2})\/(\d{4})$/)
+  if (m) {
+    return `${m[3]}-${m[2]}-${m[1]}`
+  }
+
+  return v
+}
+
+
+router.post('/record-procedure/confirmation', (req, res) => {
+  const patient = req.session.data.selectedPatient
+  if (!patient) return res.redirect('/record-procedure/patient/nhs-number')
+
+  patient.procedures ||= []
+
+  const diagnosisCodes = req.session.data.diagnosisCodes || []
+  const op = req.session.data.currentOperation || {}
+
+  const newProcedure = {
+    id: `proc-${Date.now()}`,
+    recordedAt: new Date().toISOString(),
+    date: normaliseProcedureDate(req.session.data.procedureDate || null),
+    time: req.session.data.procedureTime || null,
+    primaryDiagnosisCode: diagnosisCodes[0] || null,
+    additionalDiagnosisCodes: diagnosisCodes.slice(1),
+    asaClassification: op.asaClassification || null,
+    operationOutcome: op.operationOutcome || null,
+    operationOutcomeOtherDetail: op.operationOutcomeOtherDetail || '',
+    laterality: op.laterality || null,
+    clinicians: {
+      responsibleConsultant: req.session.data.responsibleConsultant || null,
+      supervisingSurgeon: req.session.data.supervisingSurgeon || null,
+      leadSurgeons: req.session.data.leadSurgeons || []
+    },
+    devices: req.session.data.currentOperationDevices || []
+  }
+
+  patient.procedures.push(newProcedure)
+
+//   patient.devices = buildPatientDevices(patient.procedures)
+
+  return res.redirect('/record-procedure/confirmation')
+})
+
+
+router.get('/start-prototype', (req, res) => {
+    const journey = req.query.journey
+    console.log("Launching prototype journey: " + journey)
+    req.session.data.journey = journey
+    return res.redirect('barcode-scanner')
 })
 
 module.exports = router

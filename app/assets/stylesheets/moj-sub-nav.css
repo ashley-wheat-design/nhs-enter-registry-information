@@ -1,0 +1,249 @@
+.moj-sub-navigation {
+    margin-bottom:40px
+}
+
+.moj-sub-navigation__list {
+    font-size: 0;
+    list-style: none;
+    margin: 0;
+    padding:0
+}
+
+@media (min-width: 40.0625em) {
+    .moj-sub-navigation__list {
+        box-shadow: inset 0 -1px 0 #b1b4b6;
+        width:100%
+    }
+}
+
+.moj-sub-navigation__item {
+    box-shadow: inset 0 -1px 0 #b1b4b6;
+    display: block;
+    font-family: GDS Transport, arial, sans-serif;
+    margin-top: -1px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing:grayscale
+}
+
+@media print {
+    .moj-sub-navigation__item {
+        font-family:sans-serif
+    }
+}
+
+.moj-sub-navigation__item {
+    font-size: 1rem;
+    font-weight: 400;
+    line-height:1.25
+}
+
+@media (min-width: 40.0625em) {
+    .moj-sub-navigation__item {
+        font-size: 1.1875rem;
+        line-height:1.3157894737
+    }
+}
+
+@media print {
+    .moj-sub-navigation__item {
+        font-size: 14pt;
+        line-height:1.15
+    }
+}
+
+.moj-sub-navigation__item:last-child {
+    box-shadow:none
+}
+
+@media (min-width: 40.0625em) {
+    .moj-sub-navigation__item {
+        box-shadow: none;
+        display: inline-block;
+        margin-right: 20px;
+        margin-top:0
+    }
+}
+
+.moj-sub-navigation__link {
+    display: block;
+    font-family: GDS Transport, arial, sans-serif;
+    padding-bottom: 12px;
+    padding-left: 15px;
+    padding-top: 12px;
+    position: relative;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing:grayscale
+}
+
+@media print {
+    .moj-sub-navigation__link {
+        font-family:sans-serif
+    }
+}
+
+.moj-sub-navigation__link {
+    text-decoration: underline;
+    text-decoration-thickness: max(1px, .0625rem);
+    text-underline-offset:.1578em
+}
+
+.moj-sub-navigation__link:hover {
+    -webkit-text-decoration-skip-ink: none;
+    text-decoration-skip-ink: none;
+    text-decoration-thickness: max(3px, .1875rem, .12em);
+    -webkit-text-decoration-skip: none;
+    text-decoration-skip:none
+}
+
+.moj-sub-navigation__link:focus {
+    background-color: #fd0;
+    box-shadow: 0 -2px #fd0, 0 4px #0b0c0c;
+    outline: 3px solid #0000;
+    text-decoration:none
+}
+
+@supports not (text-wrap: balance) {
+    .moj-sub-navigation__link:focus {
+        -webkit-box-decoration-break: clone;
+        box-decoration-break:clone
+    }
+}
+
+.moj-sub-navigation__link:link {
+    color:#1d70b8
+}
+
+.moj-sub-navigation__link:visited {
+    color:#4c2c92
+}
+
+.moj-sub-navigation__link:active {
+    color:#0b0c0c
+}
+
+@media (min-width: 40.0625em) {
+    .moj-sub-navigation__link {
+        padding-left:0
+    }
+}
+
+.moj-sub-navigation__link:active, .moj-sub-navigation__link:hover, .moj-sub-navigation__link:link, .moj-sub-navigation__link:visited {
+    text-decoration:none
+}
+
+.moj-sub-navigation__link:link, .moj-sub-navigation__link:visited {
+    color:#1d70b8
+}
+
+.moj-sub-navigation__link:hover {
+    color:#003078
+}
+
+.moj-sub-navigation__link:focus {
+    box-shadow: none;
+    color: #0b0c0c;
+    position:relative
+}
+
+.moj-sub-navigation__link:focus:before {
+    background-color: #0b0c0c;
+    bottom: 0;
+    content: "";
+    display: block;
+    height: 100%;
+    left: 0;
+    position: absolute;
+    width:5px
+}
+
+@media (min-width: 40.0625em) {
+    .moj-sub-navigation__link:focus:before {
+        height: 5px;
+        width:100%
+    }
+}
+
+.moj-sub-navigation__link[aria-current=page] {
+    color: #0b0c0c;
+    position: relative;
+    text-decoration:none
+}
+
+.moj-sub-navigation__link[aria-current=page]:before {
+    background-color: #1d70b8;
+    bottom: 0;
+    content: "";
+    display: block;
+    height: 100%;
+    left: 0;
+    position: absolute;
+    width:5px
+}
+
+@media (min-width: 40.0625em) {
+    .moj-sub-navigation__link[aria-current=page]:before {
+        height: 5px;
+        width:100%
+    }
+}
+
+.moj-sub-navigation__link[aria-current=page]:hover {
+    color:#003078
+}
+
+.moj-sub-navigation__link[aria-current=page]:focus:before {
+    background-color:#0b0c0c
+}
+
+/* NHS skin for MoJ sub-navigation
+   Load AFTER the MoJ sub-navigation CSS */
+
+.moj-sub-navigation__item,
+.moj-sub-navigation__link {
+  font-family: Frutiger W01, Arial, sans-serif;
+}
+
+/* Use NHS link colour */
+.moj-sub-navigation__link:link,
+.moj-sub-navigation__link:visited {
+  color: #005eb8; /* NHS blue */
+}
+
+.moj-sub-navigation__link:hover {
+  color: #003087; /* darker NHS blue (hover) */
+}
+
+/* Selected state underline/marker */
+.moj-sub-navigation__link[aria-current="page"] {
+  color: #212b32; /* NHS text */
+}
+
+.moj-sub-navigation__link[aria-current="page"]:before {
+  background-color: #005eb8; /* NHS blue marker */
+}
+
+/* NHS focus style (yellow + black) */
+.moj-sub-navigation__link:focus {
+  background-color: #ffeb3b;           /* NHS focus yellow */
+  box-shadow: 0 -2px #ffeb3b, 0 4px #212b32;
+  color: #212b32;
+  outline: 3px solid transparent;
+}
+
+/* Focus indicator bar/underline in NHS text colour */
+.moj-sub-navigation__link:focus:before {
+  background-color: #212b32;
+}
+
+/* Selected + hover stays readable */
+.moj-sub-navigation__link[aria-current="page"]:hover {
+  color: #003087;
+}
+
+.moj-sub-navigation__link[aria-current="page"]:focus:before {
+  background-color: #212b32;
+}
+
+.moj-sub-navigation ul > li {
+    margin-bottom: 0 !important;
+}

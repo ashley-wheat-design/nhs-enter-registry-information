@@ -22,3 +22,9 @@
   grid-template-columns: 2ch 1fr;
   column-gap: 0.5rem;
 }
+
+.float-right {
+  float: right;
+}
+
+@import "../stylesheets/moj-sub-nav.css";

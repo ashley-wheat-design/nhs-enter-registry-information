@@ -1,9 +1,3 @@
-/* 
-  Prototype ICD-10 lookup
-  Large, non-exhaustive, device- and procedure-relevant subset
-  Suitable for autocomplete and summaries
-*/
-
 module.exports = {
   // --- Ophthalmology ---
   'H25.0': 'Senile incipient cataract',

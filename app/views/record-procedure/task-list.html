@@ -1,5 +1,5 @@
 {% extends "../layout.html" %}
-{% set pageName = "Barcode scanner" %}
+{% set pageName = "Record a procedure" %}
 
 {% block beforeContent %}
 <a class="nhsuk-back-link" href="#">
@@ -14,6 +14,7 @@
     <div class="nhsuk-grid-column-two-thirds">
       <h1 class="nhsuk-heading-l">Record a procedure</h1>
       <ul class="nhsuk-task-list">
+        {% if data.journey == "addProcedure" %}
         <li class="nhsuk-task-list__item nhsuk-task-list__item--with-link">
           <div class="nhsuk-task-list__name-and-hint">
             <a class="nhsuk-link nhsuk-task-list__link nhsuk-link--no-visited-state"
@@ -34,6 +35,7 @@
           </div>
           {% endif %}
         </li>
+        {% endif %}
         <li class="nhsuk-task-list__item nhsuk-task-list__item--with-link">
           <div class="nhsuk-task-list__name-and-hint">
             <a class="nhsuk-link nhsuk-task-list__link nhsuk-link--no-visited-state"

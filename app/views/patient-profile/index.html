@@ -1,0 +1,271 @@
+{% extends 'layout.html' %}
+{% set p = data.selectedPatient %}
+{% set pageName = "Registry information" %}
+{% set showPatientInfo = true %}
+{% set currentSection = "record-procedure" %}
+
+{{ p.name }}
+
+{% block beforeContent %}
+
+{% endblock %}
+
+{% block content %}
+
+<div class="nhsuk-grid-row">
+  <div class="nhsuk-grid-column-full">
+    <form class="form" action="confirmation" method="post">
+      <div class="nhsuk-form-group">
+        <fieldset class="nhsuk-fieldset">
+          <legend class="nhsuk-fieldset__legend nhsuk-fieldset__legend--l">
+            <h1 class="nhsuk-fieldset__heading-l">
+              {{ p.firstName }} {{ p.lastName }}'s procedures and devices
+            </h1>
+          </legend>
+          <a href="/record-procedure/" class="nhsuk-button">
+            Record a procedure
+          </a>
+
+          <div class="nhsuk-tabs nhsuk-u-margin-top-4" data-module="nhsuk-tabs">
+            <h2 class="nhsuk-tabs__title">
+              Contents
+            </h2>
+            <ul class="nhsuk-tabs__list">
+              <li class="nhsuk-tabs__list-item nhsuk-tabs__list-item--selected">
+                <a class="nhsuk-tabs__tab" href="#procedures">
+                  Procedures ({{ p.procedures.length }})
+                </a>
+              </li>
+              <li class="nhsuk-tabs__list-item">
+                <a class="nhsuk-tabs__tab" href="#devices">
+                  Devices ({{ (p.devices or []).length }})
+                </a>
+              </li>
+            </ul>
+            <div class="nhsuk-tabs__panel" id="procedures">
+              <table class="nhsuk-table">
+                <caption class="nhsuk-table__caption">
+                  Procedures
+                </caption>
+                <thead class="nhsuk-table__head">
+                  <tr class="nhsuk-table__row">
+                    <th scope="col" class="nhsuk-table__header">
+                      Date
+                    </th>
+                    <th scope="col" class="nhsuk-table__header nhsuk-table__header">
+                      Primary diagnosis
+                    </th>
+                    <th scope="col" class="nhsuk-table__header nhsuk-table__header">
+                      Outcome
+                    </th>
+                    <th scope="col" class="nhsuk-table__header nhsuk-table__header">
+                      Responsible consultant
+                    </th>
+                  </tr>
+                </thead>
+                <tbody class="nhsuk-table__body">
+                  {% for proc in p.procedures %}
+                  <tr class="nhsuk-table__row">
+                    <th scope="row" class="nhsuk-table__header">
+                      <a class="nhsuk-link--no-visited-state" href="">{{ formatDate(proc.date) }}</a>
+                    </th>
+                    <td class="nhsuk-table__cell nhsuk-table__cell">
+                      {{ proc.primaryDiagnosisCode }} - {{ getIcd10Label(proc.primaryDiagnosisCode) or
+                      'Unknown diagnosis'}}
+                    </td>
+                    <td class="nhsuk-table__cell nhsuk-table__cell">
+                      {{ proc.operationOutcome | capitalize }}
+                    </td>
+                    <td class="nhsuk-table__cell nhsuk-table__cell">
+                      {% set c = proc.clinicians.responsibleConsultant %}
+                      {% if c %}
+                      {{ c.firstName }} {{ c.lastName }}
+            </div>
+            {% else %}
+            <span class="nhsuk-hint-text">Not recorded</span>
+            {% endif %}
+            </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+            </table>
+          </div>
+          <div class="nhsuk-tabs__panel nhsuk-tabs__panel--hidden" id="devices">
+            <table class="nhsuk-table">
+              <caption class="nhsuk-table__caption">
+                Devices
+              </caption>
+              <thead class="nhsuk-table__head">
+                <tr class="nhsuk-table__row">
+                  <th scope="col" class="nhsuk-table__header">
+                    Description
+                  </th>
+                  <th scope="col" class="nhsuk-table__header nhsuk-table__header">
+                    Manufacturer
+                  </th>
+                  <th scope="col" class="nhsuk-table__header nhsuk-table__header" width="20%">
+                    Procedure date
+                  </th>
+                  <th scope="col" class="nhsuk-table__header nhsuk-table__header">
+                    Status
+                  </th>
+                </tr>
+              </thead>
+              <tbody class="nhsuk-table__body">
+                {% if p.devices and p.devices.length %}
+                {% for device in p.devices %}
+                <tr class="nhsuk-table__row">
+                  <td class="nhsuk-table__cell">
+                    <a class="nhsuk-link--no-visited-state nhsuk-u-font-weight-bold" href="">{{
+                      device.productDescription }}</a>
+                  </td>
+                  <td class="nhsuk-table__cell nhsuk-table__cell">
+                    {{ device.deviceManufacturer }}
+                  </td>
+                  <td class="nhsuk-table__cell nhsuk-table__cell">
+                    <a class="nhsuk-link--no-visited-state" href="/procedures/{{ device.procedureId }}">
+                      {{ formatDate(device.procedureDate) }}
+                    </a>
+                  </td>
+                  <td class="nhsuk-table__cell nhsuk-table__cell">
+                    {% if device.status == "Implanted" %}
+                    <strong class="nhsuk-tag nhsuk-tag--blue">
+                      {{ device.status }}
+                    </strong>
+                    {% elif device.status == "Removed" %}
+                    <strong class="nhsuk-tag nhsuk-tag--grey">
+                      {{ device.status }}
+                    </strong>
+                    {% else %}
+                    <div class="nhsuk-hint">Not recorded</div>
+                    {% endif %}
+                  </td>
+                </tr>
+                {% endfor %}
+                {% endif %}
+              </tbody>
+            </table>
+          </div>
+          <div class="nhsuk-tabs__panel nhsuk-tabs__panel--hidden" id="past-month">
+            <table class="nhsuk-table">
+              <caption class="nhsuk-table__caption">
+                Past month
+              </caption>
+              <thead class="nhsuk-table__head">
+                <tr class="nhsuk-table__row">
+                  <th scope="col" class="nhsuk-table__header">
+                    Case manager
+                  </th>
+                  <th scope="col" class="nhsuk-table__header nhsuk-table__header--numeric">
+                    Cases opened
+                  </th>
+                  <th scope="col" class="nhsuk-table__header nhsuk-table__header--numeric">
+                    Cases closed
+                  </th>
+                </tr>
+              </thead>
+              <tbody class="nhsuk-table__body">
+                <tr class="nhsuk-table__row">
+                  <td class="nhsuk-table__cell">
+                    David Francis
+                  </td>
+                  <td class="nhsuk-table__cell nhsuk-table__cell--numeric">
+                    98
+                  </td>
+                  <td class="nhsuk-table__cell nhsuk-table__cell--numeric">
+                    95
+                  </td>
+                </tr>
+                <tr class="nhsuk-table__row">
+                  <td class="nhsuk-table__cell">
+                    Paul Farmer
+                  </td>
+                  <td class="nhsuk-table__cell nhsuk-table__cell--numeric">
+                    122
+                  </td>
+                  <td class="nhsuk-table__cell nhsuk-table__cell--numeric">
+                    131
+                  </td>
+                </tr>
+                <tr class="nhsuk-table__row">
+                  <td class="nhsuk-table__cell">
+                    Rita Patel
+                  </td>
+                  <td class="nhsuk-table__cell nhsuk-table__cell--numeric">
+                    126
+                  </td>
+                  <td class="nhsuk-table__cell nhsuk-table__cell--numeric">
+                    142
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="nhsuk-tabs__panel nhsuk-tabs__panel--hidden" id="past-year">
+            <table class="nhsuk-table">
+              <caption class="nhsuk-table__caption">
+                Past year
+              </caption>
+              <thead class="nhsuk-table__head">
+                <tr class="nhsuk-table__row">
+                  <th scope="col" class="nhsuk-table__header">
+                    Case manager
+                  </th>
+                  <th scope="col" class="nhsuk-table__header nhsuk-table__header--numeric">
+                    Cases opened
+                  </th>
+                  <th scope="col" class="nhsuk-table__header nhsuk-table__header--numeric">
+                    Cases closed
+                  </th>
+                </tr>
+              </thead>
+              <tbody class="nhsuk-table__body">
+                <tr class="nhsuk-table__row">
+                  <td class="nhsuk-table__cell">
+                    David Francis
+                  </td>
+                  <td class="nhsuk-table__cell nhsuk-table__cell--numeric">
+                    1380
+                  </td>
+                  <td class="nhsuk-table__cell nhsuk-table__cell--numeric">
+                    1472
+                  </td>
+                </tr>
+                <tr class="nhsuk-table__row">
+                  <td class="nhsuk-table__cell">
+                    Paul Farmer
+                  </td>
+                  <td class="nhsuk-table__cell nhsuk-table__cell--numeric">
+                    1129
+                  </td>
+                  <td class="nhsuk-table__cell nhsuk-table__cell--numeric">
+                    1083
+                  </td>
+                </tr>
+                <tr class="nhsuk-table__row">
+                  <td class="nhsuk-table__cell">
+                    Rita Patel
+                  </td>
+                  <td class="nhsuk-table__cell nhsuk-table__cell--numeric">
+                    1539
+                  </td>
+                  <td class="nhsuk-table__cell nhsuk-table__cell--numeric">
+                    1265
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+      </div>
+
+
+
+
+
+
+      </fieldset>
+  </div>
+  </form>
+</div>
+</div>
+{% endblock %}

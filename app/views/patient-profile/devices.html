@@ -1,0 +1,149 @@
+{% extends 'layout.html' %}
+{% set pageName = "{{ Patient profile }}" %}
+{% set p = data.selectedPatient %}
+{% set showPatientInfo = false %}
+
+
+
+
+{{ p.name }}
+
+{% block beforeContent %}
+
+{% endblock %}
+
+{% block content %}
+
+<div class="nhsuk-grid-row">
+    <div class="nhsuk-grid-column-three-quarters">
+        <form class="form" action="confirmation" method="post">
+            <div class="nhsuk-form-group">
+                <fieldset class="nhsuk-fieldset">
+                    <legend class="nhsuk-fieldset__legend nhsuk-fieldset__legend--l">
+                        <h1 class="nhsuk-fieldset__heading-l">
+                            {{ p.firstName }} {{ p.lastName }}'s registry information
+                        </h1>
+                    </legend>
+
+                    <nav class="moj-sub-navigation" aria-label="Patient navigation">
+                        <ul class="moj-sub-navigation__list">
+                            <li class="moj-sub-navigation__item">
+                                <a class="moj-sub-navigation__link" href="overview">
+                                    Overview
+                                </a>
+                            </li>
+                            <li class="moj-sub-navigation__item">
+                                <a class="moj-sub-navigation__link" href="procedures">
+                                    Procedures
+                                </a>
+                            </li>
+                            <li class="moj-sub-navigation__item">
+                                <a class="moj-sub-navigation__link" aria-current="page" href="devices">
+                                    Devices
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+
+
+                    <h2 class="nhsuk-heading-l">Devices ({{ (p.devices or []).length }})</h2>
+
+                    {% if p.devices and p.devices.length %}
+                    {% for device in p.devices %}
+                    <!-- <div class="nhsuk-card">
+  <div class="nhsuk-card__content">
+    <h2 class="nhsuk-card__heading nhsuk-heading-s">
+      <a class="nhsuk-link--no-visited-state"
+                                    href="/patients/{{ p.nhsNumber }}/devices/{{ device.uniqueDeviceIdentifier }}">
+                                    <strong>{{ device.productDescription }}</strong>
+                                </a>
+    </h2>
+    <p class="nhsuk-card__description">Card description text goes here</p>
+  </div>
+</div> -->
+
+                    <div class="nhsuk-card">
+                        <div class="nhsuk-card__content">
+                            <h3 class="nhsuk-card__heading nhsuk-heading-s">
+                                {{ device.medicalDeviceBrandOrModelName }}
+                                
+                                <!-- <span class="nhsuk-body float-right"><a class="nhsuk-link">Remove</a></span> -->
+                
+                            </h3>
+                            <span class="nhsuk-tag nhsuk-tag--grey nhsuk-u-margin-bottom-4">{{ device.status }}</span>
+                            <p class="nhsuk-card__description nhsuk-u-margin-bottom-3">
+                                {{ device.productDescription }}
+                            </p>
+                            <dl class="nhsuk-summary-list nhsuk-summary-list--no-border">
+                                <div class="nhsuk-summary-list__row">
+                                    <dt class="nhsuk-summary-list__key">
+                                        Manufacturer
+                                    </dt>
+                                    <dd class="nhsuk-summary-list__value">
+                                        {{ device.deviceManufacturer }}
+                                    </dd>
+                                </div>
+                                <div class="nhsuk-summary-list__row">
+                                    <dt class="nhsuk-summary-list__key">
+                                        Reference
+                                    </dt>
+                                    <dd class="nhsuk-summary-list__value">
+                                        {{ device.medicalDeviceReferenceNumber }}
+                                    </dd>
+                                </div>
+                                <div class="nhsuk-summary-list__row">
+                                    <dt class="nhsuk-summary-list__key">
+                                        Serial
+                                    </dt>
+                                    <dd class="nhsuk-summary-list__value">
+                                        {{ device.medicalDeviceSerialNumber }}
+                                    </dd>
+                                </div>
+                                <div class="nhsuk-summary-list__row">
+                                    <dt class="nhsuk-summary-list__key">
+                                        Lot
+                                    </dt>
+                                    <dd class="nhsuk-summary-list__value">
+                                        {{ device.medicalDeviceLotNumber }}
+                                    </dd>
+                                </div>
+                                <div class="nhsuk-summary-list__row">
+                                    <dt class="nhsuk-summary-list__key">
+                                        Expiry date
+                                    </dt>
+                                    <dd class="nhsuk-summary-list__value">
+                                        {{ formatDate(device.medicalDeviceExpiryDate) }}
+                                    </dd>
+                                </div>
+                                <div class="nhsuk-summary-list__row">
+                                    <dt class="nhsuk-summary-list__key">
+                                        UDI
+                                    </dt>
+                                    <dd class="nhsuk-summary-list__value">
+                                        {{ device.uniqueDeviceIdentifier }}
+                                    </dd>
+                                </div>
+                                <div class="nhsuk-summary-list__row">
+                                    <dt class="nhsuk-summary-list__key">Procedure</dt>
+                                    <dd class="nhsuk-summary-list__value">
+                                        <a class="nhsuk-link--no-visited-state"
+                                            href="/procedures/{{ device.procedureId }}">
+                                            {{ formatDate(device.procedureDate) }}
+                                        </a>
+                                    </dd>
+                                </div>
+                            </dl>
+                        </div>
+                    </div>
+
+                    {% endfor %}
+                    {% else %}
+                    <p class="nhsuk-hint-text">No devices recorded for this patient.</p>
+                    {% endif %}
+
+                </fieldset>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,260 @@
+{% extends 'layout.html' %}
+{% set p = data.selectedPatient or {} %}
+{% set proc = procedure or {} %}
+{% set pageName = 'Procedure details' %}
+{% set showPatientInfo = true %}
+{% set currentSection = 'record-procedure' %}
+
+{% set returnTo = '/patient-profile/procedures/' + proc.id %}
+
+{% block beforeContent %}
+<a class="nhsuk-back-link" href="/patient-profile/">Back</a>
+{% endblock %}
+
+{% block content %}
+
+<div class="nhsuk-grid-row">
+  <div class="nhsuk-grid-column-two-thirds">
+
+    <h1 class="nhsuk-heading-l">
+      Procedure on {{ formatDate(proc.date) }}
+    </h1>
+
+
+    <form class="form" action="/patient-profile/procedures/{{ proc.id }}/save" method="post">
+
+      <div class="nhsuk-card nhsuk-u-margin-top-6 nhsuk-u-margin-bottom-3">
+        <div class="nhsuk-card__content">
+
+          <dl class="nhsuk-summary-list">
+
+            <div class="nhsuk-summary-list__row">
+              <dt class="nhsuk-summary-list__key">Procedure date</dt>
+              <dd class="nhsuk-summary-list__value">
+                {% if proc.date %}{{ formatDate(proc.date) }}{% else %}—{% endif %}
+              </dd>
+              <dd class="nhsuk-summary-list__actions">
+                <a class="nhsuk-link"
+                   href="/record-procedure/procedure/procedure-date?returnTo={{ returnTo | urlencode }}">
+                  Change<span class="nhsuk-u-visually-hidden"> procedure date</span>
+                </a>
+              </dd>
+            </div>
+
+            <div class="nhsuk-summary-list__row">
+              <dt class="nhsuk-summary-list__key">Procedure time</dt>
+              <dd class="nhsuk-summary-list__value">
+                {% if proc.time %}{{ proc.time }}{% else %}—{% endif %}
+              </dd>
+              <dd class="nhsuk-summary-list__actions">
+                <a class="nhsuk-link"
+                   href="/record-procedure/procedure/procedure-time?returnTo={{ returnTo | urlencode }}">
+                  Change<span class="nhsuk-u-visually-hidden"> procedure time</span>
+                </a>
+              </dd>
+            </div>
+
+            <div class="nhsuk-summary-list__row">
+              <dt class="nhsuk-summary-list__key">Primary diagnosis</dt>
+              <dd class="nhsuk-summary-list__value">
+                {% if proc.primaryDiagnosisCode %}
+                  {{ proc.primaryDiagnosisCode }}{% if getIcd10Label(proc.primaryDiagnosisCode) %} - {{ getIcd10Label(proc.primaryDiagnosisCode) }}{% endif %}
+                {% else %}
+                  —
+                {% endif %}
+              </dd>
+              <dd class="nhsuk-summary-list__actions">
+                <a class="nhsuk-link"
+                   href="/record-procedure/procedure/primary-diagnosis?returnTo={{ returnTo | urlencode }}">
+                  Change<span class="nhsuk-u-visually-hidden"> primary diagnosis</span>
+                </a>
+              </dd>
+            </div>
+
+            <div class="nhsuk-summary-list__row">
+              <dt class="nhsuk-summary-list__key">Additional diagnoses</dt>
+              <dd class="nhsuk-summary-list__value">
+                {% if proc.additionalDiagnosisCodes and proc.additionalDiagnosisCodes.length %}
+                  <ul class="nhsuk-list nhsuk-u-margin-bottom-0">
+                    {% for code in proc.additionalDiagnosisCodes %}
+                      <li>
+                        {{ code }}{% if getIcd10Label(code) %} - {{ getIcd10Label(code) }}{% endif %}
+                      </li>
+                    {% endfor %}
+                  </ul>
+                {% else %}
+                  <div class="nhsuk-hint">None entered</div>
+                {% endif %}
+              </dd>
+              <dd class="nhsuk-summary-list__actions">
+                <a class="nhsuk-link"
+                   href="/record-procedure/procedure/add-diagnosis?returnTo={{ returnTo | urlencode }}">
+                  Change<span class="nhsuk-u-visually-hidden"> additional diagnoses</span>
+                </a>
+              </dd>
+            </div>
+
+            <div class="nhsuk-summary-list__row">
+              <dt class="nhsuk-summary-list__key">ASA physical status</dt>
+              <dd class="nhsuk-summary-list__value">
+                {% if proc.asaClassification %}
+                  {{ proc.asaClassification }}{% if asaPhysicalStatus[proc.asaClassification] %} - {{ asaPhysicalStatus[proc.asaClassification] }}{% endif %}
+                {% else %}
+                  —
+                {% endif %}
+              </dd>
+              <dd class="nhsuk-summary-list__actions">
+                <a class="nhsuk-link"
+                   href="/record-procedure/procedure/physical-status?returnTo={{ returnTo | urlencode }}">
+                  Change<span class="nhsuk-u-visually-hidden"> ASA physical status</span>
+                </a>
+              </dd>
+            </div>
+
+            <div class="nhsuk-summary-list__row">
+              <dt class="nhsuk-summary-list__key">Operation outcome</dt>
+              <dd class="nhsuk-summary-list__value">
+                {% if proc.operationOutcome == 'implant' %}
+                  Implant
+                {% elif proc.operationOutcome == 'device-removal' %}
+                  Removal of device
+                {% elif proc.operationOutcome == 'replacement' %}
+                  Replacement (removal and implant)
+                {% elif proc.operationOutcome == 'other' %}
+                  Other
+                  {% if proc.operationOutcomeOtherDetail %}
+                    <br><span class="nhsuk-hint">{{ proc.operationOutcomeOtherDetail }}</span>
+                  {% endif %}
+                {% else %}
+                  —
+                {% endif %}
+              </dd>
+              <dd class="nhsuk-summary-list__actions">
+                <a class="nhsuk-link"
+                   href="/record-procedure/procedure/operation-details?returnTo={{ returnTo | urlencode }}">
+                  Change<span class="nhsuk-u-visually-hidden"> operation outcome</span>
+                </a>
+              </dd>
+            </div>
+
+            <div class="nhsuk-summary-list__row">
+              <dt class="nhsuk-summary-list__key">Anatomical side</dt>
+              <dd class="nhsuk-summary-list__value">
+                {% if proc.laterality %}{{ getLateralityLabel(proc.laterality) }}{% else %}—{% endif %}
+              </dd>
+              <dd class="nhsuk-summary-list__actions">
+                <a class="nhsuk-link"
+                   href="/record-procedure/procedure/operation-details?returnTo={{ returnTo | urlencode }}">
+                  Change<span class="nhsuk-u-visually-hidden"> anatomical side</span>
+                </a>
+              </dd>
+            </div>
+
+          </dl>
+        </div>
+      </div>
+
+      <div class="nhsuk-card nhsuk-u-margin-bottom-3">
+        <div class="nhsuk-card__content">
+          <div class="nhsuk-grid-row">
+            <div class="nhsuk-grid-column-two-thirds">
+              <h2 class="nhsuk-card__heading nhsuk-heading-m">
+                Devices ({{ (proc.devices or []).length }})
+              </h2>
+            </div>
+            <div class="nhsuk-grid-column-one-third nhsuk-u-text-align-right nhsuk-body">
+              <a class="nhsuk-link nhsuk-link--no-visited-state"
+                 href="/record-procedure/devices/add-devices?returnTo={{ returnTo | urlencode }}">
+                Change<span class="nhsuk-u-visually-hidden"> devices</span>
+              </a>
+            </div>
+          </div>
+
+          {% if proc.devices and proc.devices.length %}
+            <ul class="nhsuk-list nhsuk-u-margin-top-3">
+              {% for d in proc.devices %}
+                <li class="nhsuk-u-margin-bottom-2">
+                  <a class="nhsuk-link--no-visited-state"
+                     href="/patient-profile/devices/{{ (d.uniqueDeviceIdentifier or d.selectedDeviceCode) | urlencode }}">
+                    {{ d.medicalDeviceBrandOrModelName or d.productDescription }}
+                  </a>
+                  <div class="nhsuk-hint">
+                    {{ d.deviceManufacturer }}
+                  </div>
+                </li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <p class="nhsuk-body">—</p>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="nhsuk-card">
+        <div class="nhsuk-card__content">
+          <div class="nhsuk-grid-row">
+            <div class="nhsuk-grid-column-two-thirds">
+              <h2 class="nhsuk-card__heading nhsuk-heading-m">Clinician details</h2>
+            </div>
+            <div class="nhsuk-grid-column-one-third nhsuk-u-text-align-right nhsuk-body">
+              <a class="nhsuk-link nhsuk-link--no-visited-state"
+                 href="/record-procedure/clinician/clinicians-summary?returnTo={{ returnTo | urlencode }}">
+                Change<span class="nhsuk-u-visually-hidden"> clinician details</span>
+              </a>
+            </div>
+          </div>
+
+          {% set clinicians = proc.clinicians or {} %}
+          <dl class="nhsuk-summary-list nhsuk-summary-list--no-border">
+
+            <div class="nhsuk-summary-list__row">
+              <dt class="nhsuk-summary-list__key">Responsible consultant</dt>
+              <dd class="nhsuk-summary-list__value">
+                {% set c = clinicians.responsibleConsultant %}
+                {% if c %}{{ c.title }} {{ c.firstName }} {{ c.lastName }}{% else %}—{% endif %}
+              </dd>
+            </div>
+
+            <div class="nhsuk-summary-list__row">
+              <dt class="nhsuk-summary-list__key">Supervising surgeon</dt>
+              <dd class="nhsuk-summary-list__value">
+                {% set c = clinicians.supervisingSurgeon %}
+                {% if c %}{{ c.title }} {{ c.firstName }} {{ c.lastName }}{% else %}—{% endif %}
+              </dd>
+            </div>
+
+            <div class="nhsuk-summary-list__row">
+              <dt class="nhsuk-summary-list__key">Lead surgeons</dt>
+              <dd class="nhsuk-summary-list__value">
+                {% if clinicians.leadSurgeons and clinicians.leadSurgeons.length %}
+                  <ul class="nhsuk-list nhsuk-u-margin-bottom-0">
+                    {% for c in clinicians.leadSurgeons %}
+                      <li>{{ c.title }} {{ c.firstName }} {{ c.lastName }}</li>
+                    {% endfor %}
+                  </ul>
+                {% else %}
+                  —
+                {% endif %}
+              </dd>
+            </div>
+
+          </dl>
+        </div>
+      </div>
+
+      <div class="nhsuk-button-group">
+        <button class="nhsuk-button" data-module="nhsuk-button" type="submit">
+          Save changes
+        </button>
+
+        <a class="nhsuk-button nhsuk-button--secondary" role="button" href="/patient-profile/">
+          Cancel
+        </a>
+      </div>
+
+    </form>
+
+  </div>
+</div>
+
+{% endblock %}

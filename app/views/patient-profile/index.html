@@ -64,30 +64,34 @@
                   </tr>
                 </thead>
                 <tbody class="nhsuk-table__body">
-                  {% for proc in p.procedures %}
-                  <tr class="nhsuk-table__row">
-                    <th scope="row" class="nhsuk-table__header">
-                      <a class="nhsuk-link--no-visited-state" href="">{{ formatDate(proc.date) }}</a>
-                    </th>
-                    <td class="nhsuk-table__cell nhsuk-table__cell">
-                      {{ proc.primaryDiagnosisCode }} - {{ getIcd10Label(proc.primaryDiagnosisCode) or
-                      'Unknown diagnosis'}}
-                    </td>
-                    <td class="nhsuk-table__cell nhsuk-table__cell">
-                      {{ proc.operationOutcome | capitalize }}
-                    </td>
-                    <td class="nhsuk-table__cell nhsuk-table__cell">
-                      {% set c = proc.clinicians.responsibleConsultant %}
-                      {% if c %}
-                      {{ c.firstName }} {{ c.lastName }}
-            </div>
-            {% else %}
-            <span class="nhsuk-hint-text">Not recorded</span>
-            {% endif %}
-            </td>
-            </tr>
-            {% endfor %}
-            </tbody>
+  {% for proc in p.procedures %}
+    <tr class="nhsuk-table__row">
+      <th scope="row" class="nhsuk-table__header">
+        <a class="nhsuk-link--no-visited-state" href="/patient-profile/procedures/{{ proc.id }}">
+          {{ formatDate(proc.date) }}
+        </a>
+      </th>
+
+      <td class="nhsuk-table__cell">
+        {{ proc.primaryDiagnosisCode }} - {{ getIcd10Label(proc.primaryDiagnosisCode) or 'Unknown diagnosis' }}
+      </td>
+
+      <td class="nhsuk-table__cell">
+        {{ proc.operationOutcome | capitalize }}
+      </td>
+
+      <td class="nhsuk-table__cell">
+        {% set c = proc.clinicians.responsibleConsultant %}
+        {% if c %}
+          {{ c.firstName }} {{ c.lastName }}
+        {% else %}
+          <span class="nhsuk-hint-text">Not recorded</span>
+        {% endif %}
+      </td>
+    </tr>
+  {% endfor %}
+</tbody>
+
             </table>
           </div>
           <div class="nhsuk-tabs__panel nhsuk-tabs__panel--hidden" id="devices">
@@ -116,16 +120,20 @@
                 {% for device in p.devices %}
                 <tr class="nhsuk-table__row">
                   <td class="nhsuk-table__cell">
-                    <a class="nhsuk-link--no-visited-state nhsuk-u-font-weight-bold" href="">{{
-                      device.productDescription }}</a>
+                    <a class="nhsuk-link--no-visited-state"
+   href="/patient-profile/devices/{{ (device.uniqueDeviceIdentifier or device.selectedDeviceCode) | urlencode }}">
+  {{ device.productDescription or device.medicalDeviceBrandOrModelName }}
+</a>
+
                   </td>
                   <td class="nhsuk-table__cell nhsuk-table__cell">
                     {{ device.deviceManufacturer }}
                   </td>
                   <td class="nhsuk-table__cell nhsuk-table__cell">
-                    <a class="nhsuk-link--no-visited-state" href="/procedures/{{ device.procedureId }}">
-                      {{ formatDate(device.procedureDate) }}
-                    </a>
+                    <a class="nhsuk-link--no-visited-state" href="/patient-profile/procedures/{{ device.procedureId }}">
+  {{ formatDate(device.procedureDate) }}
+</a>
+
                   </td>
                   <td class="nhsuk-table__cell nhsuk-table__cell">
                     {% if device.status == "Implanted" %}
@@ -143,116 +151,6 @@
                 </tr>
                 {% endfor %}
                 {% endif %}
-              </tbody>
-            </table>
-          </div>
-          <div class="nhsuk-tabs__panel nhsuk-tabs__panel--hidden" id="past-month">
-            <table class="nhsuk-table">
-              <caption class="nhsuk-table__caption">
-                Past month
-              </caption>
-              <thead class="nhsuk-table__head">
-                <tr class="nhsuk-table__row">
-                  <th scope="col" class="nhsuk-table__header">
-                    Case manager
-                  </th>
-                  <th scope="col" class="nhsuk-table__header nhsuk-table__header--numeric">
-                    Cases opened
-                  </th>
-                  <th scope="col" class="nhsuk-table__header nhsuk-table__header--numeric">
-                    Cases closed
-                  </th>
-                </tr>
-              </thead>
-              <tbody class="nhsuk-table__body">
-                <tr class="nhsuk-table__row">
-                  <td class="nhsuk-table__cell">
-                    David Francis
-                  </td>
-                  <td class="nhsuk-table__cell nhsuk-table__cell--numeric">
-                    98
-                  </td>
-                  <td class="nhsuk-table__cell nhsuk-table__cell--numeric">
-                    95
-                  </td>
-                </tr>
-                <tr class="nhsuk-table__row">
-                  <td class="nhsuk-table__cell">
-                    Paul Farmer
-                  </td>
-                  <td class="nhsuk-table__cell nhsuk-table__cell--numeric">
-                    122
-                  </td>
-                  <td class="nhsuk-table__cell nhsuk-table__cell--numeric">
-                    131
-                  </td>
-                </tr>
-                <tr class="nhsuk-table__row">
-                  <td class="nhsuk-table__cell">
-                    Rita Patel
-                  </td>
-                  <td class="nhsuk-table__cell nhsuk-table__cell--numeric">
-                    126
-                  </td>
-                  <td class="nhsuk-table__cell nhsuk-table__cell--numeric">
-                    142
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <div class="nhsuk-tabs__panel nhsuk-tabs__panel--hidden" id="past-year">
-            <table class="nhsuk-table">
-              <caption class="nhsuk-table__caption">
-                Past year
-              </caption>
-              <thead class="nhsuk-table__head">
-                <tr class="nhsuk-table__row">
-                  <th scope="col" class="nhsuk-table__header">
-                    Case manager
-                  </th>
-                  <th scope="col" class="nhsuk-table__header nhsuk-table__header--numeric">
-                    Cases opened
-                  </th>
-                  <th scope="col" class="nhsuk-table__header nhsuk-table__header--numeric">
-                    Cases closed
-                  </th>
-                </tr>
-              </thead>
-              <tbody class="nhsuk-table__body">
-                <tr class="nhsuk-table__row">
-                  <td class="nhsuk-table__cell">
-                    David Francis
-                  </td>
-                  <td class="nhsuk-table__cell nhsuk-table__cell--numeric">
-                    1380
-                  </td>
-                  <td class="nhsuk-table__cell nhsuk-table__cell--numeric">
-                    1472
-                  </td>
-                </tr>
-                <tr class="nhsuk-table__row">
-                  <td class="nhsuk-table__cell">
-                    Paul Farmer
-                  </td>
-                  <td class="nhsuk-table__cell nhsuk-table__cell--numeric">
-                    1129
-                  </td>
-                  <td class="nhsuk-table__cell nhsuk-table__cell--numeric">
-                    1083
-                  </td>
-                </tr>
-                <tr class="nhsuk-table__row">
-                  <td class="nhsuk-table__cell">
-                    Rita Patel
-                  </td>
-                  <td class="nhsuk-table__cell nhsuk-table__cell--numeric">
-                    1539
-                  </td>
-                  <td class="nhsuk-table__cell nhsuk-table__cell--numeric">
-                    1265
-                  </td>
-                </tr>
               </tbody>
             </table>
           </div>

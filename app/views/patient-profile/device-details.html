@@ -1,0 +1,74 @@
+{% extends 'layout.html' %}
+{% set p = data.selectedPatient or {} %}
+{% set d = device or {} %}
+{% set proc = procedure or {} %}
+{% set pageName = 'Device details' %}
+{% set showPatientInfo = true %}
+
+{% block beforeContent %}
+<a class="nhsuk-back-link" href="/patient-profile/">Back</a>
+{% endblock %}
+
+{% block content %}
+<div class="nhsuk-grid-row">
+  <div class="nhsuk-grid-column-two-thirds">
+
+    <h1 class="nhsuk-heading-l">Device details</h1>
+
+    {% if d.status %}
+      <strong class="nhsuk-tag nhsuk-u-margin-bottom-4">{{ d.status }}</strong>
+    {% endif %}
+            {% if proc and proc.id %}
+          <p class="nhsuk-body">
+            Procedure date:
+            <a class="nhsuk-link--no-visited-state" href="/patient-profile/procedures/{{ proc.id }}">
+              {% if proc.date %}{{ formatDate(proc.date) }}{% else %}View procedure{% endif %}
+            </a>
+          </p>
+        {% endif %}
+
+    <div class="nhsuk-card">
+      <div class="nhsuk-card__content">
+
+        <h2 class="nhsuk-card__heading nhsuk-heading-m">
+          {{ d.medicalDeviceBrandOrModelName or d.productDescription }}
+        </h2>
+
+        <dl class="nhsuk-summary-list nhsuk-summary-list--no-border">
+          <div class="nhsuk-summary-list__row">
+            <dt class="nhsuk-summary-list__key">Manufacturer</dt>
+            <dd class="nhsuk-summary-list__value">{{ d.deviceManufacturer or '—' }}</dd>
+          </div>
+
+          <div class="nhsuk-summary-list__row">
+            <dt class="nhsuk-summary-list__key">Reference</dt>
+            <dd class="nhsuk-summary-list__value">{{ d.medicalDeviceReferenceNumber or '—' }}</dd>
+          </div>
+
+          <div class="nhsuk-summary-list__row">
+            <dt class="nhsuk-summary-list__key">Serial</dt>
+            <dd class="nhsuk-summary-list__value">{{ d.medicalDeviceSerialNumber or '—' }}</dd>
+          </div>
+
+          <div class="nhsuk-summary-list__row">
+            <dt class="nhsuk-summary-list__key">Lot</dt>
+            <dd class="nhsuk-summary-list__value">{{ d.medicalDeviceLotNumber or '—' }}</dd>
+          </div>
+
+          <div class="nhsuk-summary-list__row">
+            <dt class="nhsuk-summary-list__key">Expiry</dt>
+            <dd class="nhsuk-summary-list__value">{{ d.medicalDeviceExpiryDate or '—' }}</dd>
+          </div>
+
+          <div class="nhsuk-summary-list__row">
+            <dt class="nhsuk-summary-list__key">UDI</dt>
+            <dd class="nhsuk-summary-list__value">{{ d.uniqueDeviceIdentifier or d.selectedDeviceCode or '—' }}</dd>
+          </div>
+        </dl>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

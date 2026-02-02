@@ -809,4 +809,168 @@ router.get('/start-prototype', (req, res) => {
     return res.redirect('barcode-scanner')
 })
 
+function clone (obj) {
+  return obj ? JSON.parse(JSON.stringify(obj)) : null
+}
+
+function inferDeviceStatus (procedure, device) {
+  if (device && device.status) return device.status
+  const outcome = procedure && procedure.operationOutcome
+  if (outcome === 'device-removal') return 'Removed'
+  return 'Implanted'
+}
+
+function buildPatientDevices (procedures) {
+  return (procedures || []).flatMap(p => {
+    const procId = p.id
+    return (p.devices || []).map(d => ({
+      procedureId: procId,
+      procedureDate: p.date || null,
+      status: inferDeviceStatus(p, d),
+      ...clone(d)
+    }))
+  })
+}
+
+function getReturnTo (req) {
+  const v = req.session.data && req.session.data.returnTo
+  return v ? String(v) : ''
+}
+
+function inEditMode (req) {
+  return Boolean(req.session.data && req.session.data.editingProcedureId)
+}
+
+function redirectAfterChange (req, res, fallback) {
+  const returnTo = getReturnTo(req)
+  if (returnTo && inEditMode(req)) return res.redirect(returnTo)
+  return res.redirect(fallback)
+}
+
+function seedProcedureEditSession (req, procedure) {
+  req.session.data.editingProcedureId = procedure.id
+
+  req.session.data.procedureDate = procedure.date || null
+  req.session.data.procedureTime = procedure.time || null
+
+  const codes = []
+  if (procedure.primaryDiagnosisCode) codes.push(procedure.primaryDiagnosisCode)
+  if (procedure.additionalDiagnosisCodes && procedure.additionalDiagnosisCodes.length) {
+    codes.push(...procedure.additionalDiagnosisCodes)
+  }
+  req.session.data.diagnosisCodes = codes
+
+  req.session.data.currentOperation ||= {}
+  req.session.data.currentOperation.asaClassification = procedure.asaClassification || null
+  req.session.data.currentOperation.operationOutcome = procedure.operationOutcome || null
+  req.session.data.currentOperation.operationOutcomeOtherDetail = procedure.operationOutcomeOtherDetail || ''
+  req.session.data.currentOperation.laterality = procedure.laterality || null
+
+  req.session.data.currentOperationDevices = clone(procedure.devices || [])
+
+  const clinicians = procedure.clinicians || {}
+  req.session.data.responsibleConsultant = clinicians.responsibleConsultant || null
+  req.session.data.supervisingSurgeon = clinicians.supervisingSurgeon || null
+  req.session.data.leadSurgeons = clinicians.leadSurgeons || []
+}
+
+function normaliseProcedureDate (value) {
+  const v = String(value || '').trim()
+  if (!v) return null
+  if (/^\d{4}-\d{2}-\d{2}$/.test(v)) return v
+
+  const m = v.match(/^(\d{2})\/(\d{2})\/(\d{4})$/)
+  if (m) return `${m[3]}-${m[2]}-${m[1]}`
+
+  return v
+}
+
+function updateProcedureFromSession (req, procedure) {
+  const diagnosisCodes = req.session.data.diagnosisCodes || []
+  const op = req.session.data.currentOperation || {}
+
+  procedure.date = normaliseProcedureDate(req.session.data.procedureDate || null)
+  procedure.time = req.session.data.procedureTime || null
+  procedure.primaryDiagnosisCode = diagnosisCodes[0] || null
+  procedure.additionalDiagnosisCodes = diagnosisCodes.slice(1)
+  procedure.asaClassification = op.asaClassification || null
+  procedure.operationOutcome = op.operationOutcome || null
+  procedure.operationOutcomeOtherDetail = op.operationOutcomeOtherDetail || ''
+  procedure.laterality = op.laterality || null
+
+  procedure.clinicians = {
+    responsibleConsultant: req.session.data.responsibleConsultant || null,
+    supervisingSurgeon: req.session.data.supervisingSurgeon || null,
+    leadSurgeons: req.session.data.leadSurgeons || []
+  }
+
+  procedure.devices = (req.session.data.currentOperationDevices || []).map(d => ({
+    ...d,
+    status: d.status || inferDeviceStatus(procedure, d)
+  }))
+}
+
+router.use((req, res, next) => {
+  req.session.data ||= {}
+
+  if (req.query && req.query.returnTo) {
+    req.session.data.returnTo = String(req.query.returnTo)
+  }
+
+  // keep patient.devices in sync
+  if (req.session.data.selectedPatient && req.session.data.selectedPatient.procedures) {
+    req.session.data.selectedPatient.devices = buildPatientDevices(req.session.data.selectedPatient.procedures)
+  }
+
+  next()
+})
+
+router.get('/patient-profile/procedures/:procedureId', (req, res) => {
+  const patient = req.session.data.selectedPatient
+  if (!patient) return res.redirect('/record-procedure/patient/nhs-number')
+
+  const procedure = (patient.procedures || []).find(p => p.id === req.params.procedureId)
+  if (!procedure) return res.redirect('/patient-profile/')
+
+  req.session.data.returnTo = `/patient-profile/procedures/${procedure.id}`
+  seedProcedureEditSession(req, procedure)
+
+  return res.render('patient-profile/procedure-details', { procedure })
+})
+
+router.post('/patient-profile/procedures/:procedureId/save', (req, res) => {
+  const patient = req.session.data.selectedPatient
+  if (!patient) return res.redirect('/record-procedure/patient/nhs-number')
+
+  const procedure = (patient.procedures || []).find(p => p.id === req.params.procedureId)
+  if (!procedure) return res.redirect('/patient-profile/')
+
+  updateProcedureFromSession(req, procedure)
+  patient.devices = buildPatientDevices(patient.procedures)
+
+  delete req.session.data.returnTo
+  delete req.session.data.editingProcedureId
+
+  return res.redirect('/patient-profile/')
+})
+
+router.get('/patient-profile/devices/:udi', (req, res) => {
+  const patient = req.session.data.selectedPatient
+  if (!patient) return res.redirect('/record-procedure/patient/nhs-number')
+
+  const udi = String(req.params.udi || '')
+  const devices = patient.devices || []
+  const device = devices.find(d =>
+    String(d.uniqueDeviceIdentifier || d.selectedDeviceCode || '') === udi
+  )
+
+  if (!device) return res.redirect('/patient-profile/')
+
+  const procedure = (patient.procedures || []).find(p => p.id === device.procedureId) || null
+
+  return res.render('patient-profile/device-details', { device, procedure })
+})
+
+
+
 module.exports = router

@@ -1,6 +1,6 @@
 {% extends "../layout.html" %}
 {% set pageName = "Procedure saved" %}
-
+{% set p = data.selectedPatient %}
 {% block beforeContent %}
 <a class="nhsuk-back-link" href="#">
   Back
@@ -19,19 +19,12 @@
       </div>
     </div>
 
-    {% if data.recordProcedureReturnTo %}
-      <p class="nhsuk-u-margin-top-6">
-        <a class="nhsuk-button" href="{{ data.recordProcedureReturnTo }}">
-          Return to patient record
-        </a>
-      </p>
-    {% else %}
-      <p class="nhsuk-u-margin-top-6">
-        <a class="nhsuk-button" href="/record-procedure">
-          Record another procedure
-        </a>
-      </p>
-    {% endif %}
+    <p class="nhsuk-body nhsuk-u-margin-top-6">
+      <ul class="nhsuk-list nhsuk-list--no-border">
+        <li><a class="nhsuk-link--no-visited-state" href="/record-procedure">Record another procedure</a></li>
+        <li><a class="nhsuk-link--no-visited-state" href="../patient-profile/">Go back to {{p.firstName}} {{p.lastName}}'s procedures and devices</a></li>
+      </ul>
+    </p>
 
   </div>
 </div>

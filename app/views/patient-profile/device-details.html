@@ -15,8 +15,10 @@
 
     <h1 class="nhsuk-heading-l">Device details</h1>
 
-    {% if d.status %}
-      <strong class="nhsuk-tag nhsuk-u-margin-bottom-4">{{ d.status }}</strong>
+    {% if d.status == "Implanted" %}
+      <strong class="nhsuk-tag nhsuk-tag--blue nhsuk-u-margin-bottom-4">{{ d.status }}</strong>
+    {% else %}
+    <strong class="nhsuk-tag nhsuk-tag--grey nhsuk-u-margin-bottom-4">{{ d.status }}</strong>
     {% endif %}
             {% if proc and proc.id %}
           <p class="nhsuk-body">

@@ -456,45 +456,10 @@ router.get('/record-procedure/procedure/operation-summary', (req, res) => {
 })
 
 router.post('/record-procedure/procedure/confirm', (req, res) => {
-  const patient = req.session.data.selectedPatient
-  if (!patient) {
-    return res.redirect('/record-procedure/patient/nhs-number')
-  }
-
-  patient.procedures ||= []
-
-  const diagnosisCodes = req.session.data.diagnosisCodes || []
-  const op = req.session.data.currentOperation || {}
-
-  const newProcedure = {
-    id: `proc-${Date.now()}`,
-    recordedAt: new Date().toISOString(),
-    date: req.session.data.procedureDate || null,
-    time: req.session.data.procedureTime || null,
-    primaryDiagnosisCode: diagnosisCodes[0] || null,
-    additionalDiagnosisCodes: diagnosisCodes.slice(1),
-    asaClassification: op.asaClassification || null,
-    operationOutcome: op.operationOutcome || null,
-    operationOutcomeOtherDetail: op.operationOutcomeOtherDetail || '',
-    laterality: op.laterality || null,
-    clinicians: {
-      responsibleConsultant: req.session.data.responsibleConsultant || null,
-      supervisingSurgeon: req.session.data.supervisingSurgeon || null,
-      leadSurgeons: req.session.data.leadSurgeons || []
-    },
-    devices: req.session.data.currentOperationDevices || []
-  }
-
-  patient.procedures.push(newProcedure)
-
-  delete req.session.data.currentOperation
-  delete req.session.data.diagnosisCodes
-  delete req.session.data.procedureDate
-  delete req.session.data.procedureTime
-  delete req.session.data.currentOperationDevices
-
+  // This step should ONLY mark the procedure details task as complete.
+  // The procedure itself is created once, when the user submits the full task list
+  // (see POST /record-procedure/confirmation).
   req.session.data.procedureDetailsComplete = true
-
   return res.redirect('/record-procedure/task-list')
 })
 
@@ -796,9 +761,32 @@ router.post('/record-procedure/confirmation', (req, res) => {
 
   patient.procedures.push(newProcedure)
 
-//   patient.devices = buildPatientDevices(patient.procedures)
+  // keep derived device list in sync
+  patient.devices = buildPatientDevices(patient.procedures)
 
-  return res.redirect('/record-procedure/confirmation')
+  // clear in-progress data ready for the next procedure
+  delete req.session.data.currentOperation
+  delete req.session.data.diagnosisCodes
+  delete req.session.data.procedureDate
+  delete req.session.data.procedureTime
+  delete req.session.data.currentOperationDevices
+
+  delete req.session.data.responsibleConsultant
+  delete req.session.data.supervisingSurgeon
+  delete req.session.data.leadSurgeons
+  delete req.session.data.selectedClinicians
+
+  delete req.session.data.procedureDetailsComplete
+  delete req.session.data.deviceDetailsComplete
+  delete req.session.data.clinicianDetailsComplete
+
+  // If this was launched from the patient profile, go back there.
+  const journey = req.session.data.journey
+  if (journey === 'addProcedure' || journey === 'singlePatientView') {
+    return res.redirect('/patient-profile/')
+  }
+
+  return res.redirect('/dashboard')
 })
 
 
@@ -806,6 +794,9 @@ router.get('/start-prototype', (req, res) => {
     const journey = req.query.journey
     console.log("Launching prototype journey: " + journey)
     req.session.data.journey = journey
+    if (journey == "singlePatientView"){
+      return res.redirect('dashboard')
+    }
     return res.redirect('barcode-scanner')
 })
 

@@ -1,7 +1,77 @@
-{% set organisationHtml %}
-  {{ currentOrganisation.name | truncate(30) }}
-{% endset %}
+{# ------------------------------------------------------------
+   Organisation label
+------------------------------------------------------------ #}
+{% set organisationHtml = "" %}
+{% if currentOrganisation and currentOrganisation.name %}
+  {% set organisationHtml %}
+    {{ currentOrganisation.name | truncate(30) }}
+  {% endset %}
+{% endif %}
 
+{# ------------------------------------------------------------
+   Account items
+------------------------------------------------------------ #}
+{% set accountItems = [] %}
+
+{% if currentUser %}
+  {% set accountItems = accountItems.concat([{
+    href: "/user-profile",
+    text: (currentUser.firstName + " " + currentUser.lastName),
+    icon: true
+  }]) %}
+{% endif %}
+
+{% if currentOrganisation %}
+  {% set accountItems = accountItems.concat([{
+    html: organisationHtml
+  }]) %}
+{% endif %}
+
+{% set accountItems = accountItems.concat([{
+  href: "/sign-out",
+  text: "Log out"
+}]) %}
+
+{# ------------------------------------------------------------
+   Navigation items (journey-aware)
+------------------------------------------------------------ #}
+{% set navItemsWithAccountAndNav = [
+  { text: "Home", href: "/dashboard", active: currentSection == "home" }
+] %}
+
+{% if data.journey == "singlePatientView" %}
+  {% set navItemsWithAccountAndNav = navItemsWithAccountAndNav.concat([{
+    text: "Patient search",
+    href: "/record-procedure/patient/has-nhs-number",
+    active: currentSection == "record-procedure"
+  }]) %}
+{% else %}
+  {% set navItemsWithAccountAndNav = navItemsWithAccountAndNav.concat([{
+    text: "Record a procedure",
+    href: "/record-procedure/patient/has-nhs-number",
+    active: currentSection == "record-procedure"
+  }]) %}
+{% endif %}
+
+{% set navItemsWithAccountAndNav = navItemsWithAccountAndNav.concat([
+  { text: "Bulk upload", href: "#", active: currentSection == "bulk-upload" },
+  { text: "Reports", href: "#", active: currentSection == "reports" }
+]) %}
+
+{# ------------------------------------------------------------
+   Navigation (no account variant)
+------------------------------------------------------------ #}
+{% set navItemsNavOnly = [
+  { text: "Home", href: "#", active: currentSection == "home" },
+  { text: "Record a procedure", href: "/record-procedure", active: currentSection == "record-procedure" },
+  { text: "Find procedure", href: "#", active: currentSection == "find-treatment" },
+  { text: "Bulk upload", href: "#", active: currentSection == "bulk-upload" },
+  { text: "Reporting", href: "#", active: currentSection == "reporting" }
+] %}
+
+{# ------------------------------------------------------------
+   Render header
+------------------------------------------------------------ #}
 {% if noNavigation != true and noAccount != true %}
   {{ header({
     service: {
@@ -9,65 +79,28 @@
       href: "/"
     },
     account: {
-      items: [
-        {
-          href: "/user-profile",
-          text: (currentUser.firstName + " " + currentUser.lastName),
-          icon: true
-        } if currentUser,
-        {
-          html: organisationHtml
-        } if currentOrganisation,
-        {
-          href: "/sign-out",
-          text: "Log out"
-        }
-      ]
+      items: accountItems
     },
     navigation: {
-      items: [
-        { text: "Home", href: "#", active: currentSection == "home" },
-        { text: "Procedures and devices", href: "/record-procedure/patient/has-nhs-number", active: currentSection == "record-procedure" },
-        { text: "Bulk upload", href: "#", active: currentSection == "bulk-upload" },
-        { text: "Reports", href: "#", active: currentSection == "reports" }
-      ]
+      items: navItemsWithAccountAndNav
     }
   }) }}
 
-{% elseif noNavigation != true and noAccount == true %}
+{% elif noNavigation != true and noAccount == true %}
   {{ header({
     service: {
       text: serviceName,
       href: "/"
     },
     navigation: {
-      items: [
-        { text: "Home", href: "#", active: currentSection == "home" },
-        { text: "Record procedure", href: "/record-procedure", active: currentSection == "record-procedure" },
-        { text: "Find procedure", href: "#", active: currentSection == "find-treatment" },
-        { text: "Bulk upload", href: "#", active: currentSection == "bulk-upload" },
-        { text: "Reporting", href: "#", active: currentSection == "reporting" }
-      ]
+      items: navItemsNavOnly
     },
     account: {
-      items: [
-        {
-          href: "/user-profile",
-          text: (currentUser.firstName + " " + currentUser.lastName),
-          icon: true
-        } if currentUser,
-        {
-          html: organisationHtml
-        } if currentOrganisation,
-        {
-          href: "/sign-out",
-          text: "Log out"
-        }
-      ]
+      items: accountItems
     }
   }) }}
 
-{% elseif noNavigation == true and noAccount != true %}
+{% elif noNavigation == true and noAccount != true %}
   {{ header({
     service: {
       text: serviceName,

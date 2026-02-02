@@ -1,0 +1,140 @@
+{% extends 'layout.html' %}
+{% set p = data.selectedPatient %}
+{% set pageName = "Registry information" %}
+{% set showPatientInfo = false %}
+{% set currentSection = "home" %}
+
+{{ p.name }}
+
+{% block beforeContent %}
+
+{% endblock %}
+
+{% block content %}
+
+<div class="nhsuk-grid-row">
+  <div class="nhsuk-grid-column-two-thirds">
+    <h1 class="nhsuk-heading-xl nhsuk-u-margin-bottom-9">
+        Manage registry information
+    </h1>
+    <div class="nhsuk-card nhsuk-card--warning">
+  <div class="nhsuk-card__content">
+    <h3 class="nhsuk-card__heading">
+      <span role="text">
+        <span class="nhsuk-u-visually-hidden">Important:</span> MHRA device recall
+      </span>
+    </h3>
+    <p class="nhsuk-card__description"><strong>R3™ Acetabular System</strong>
+        <br>
+    Potential premature wear has been identified in limited batches.</p>
+<br>
+<p class="nhsuk-card__description">
+<a class="nhsuk-link--no-visited-state" href="">Read the recall notice (opens in new tab)</a>
+</p>
+  </div>
+    </div>
+    </div>
+    <div class="nhsuk-grid-column-full">
+    <ul class="nhsuk-grid-row nhsuk-card-group">
+        <li class="nhsuk-grid-column-one-quarter nhsuk-card-group__item">
+    <div class="nhsuk-card nhsuk-card--clickable">
+      <div class="nhsuk-card__content">
+        <h2 class="nhsuk-card__heading nhsuk-u-font-size-64 nhsuk-u-margin-bottom-1">
+          <span role="text">
+            <span class="nhsuk-u-visually-hidden">Messages:</span> 33
+          </span>
+        </h2>
+        <a href="#/messages" class="nhsuk-card__link nhsuk-link--no-visited-state">Messages and notifications</a>
+
+      </div>
+    </div>
+  </li>
+  <li class="nhsuk-grid-column-one-quarter nhsuk-card-group__item">
+    <div class="nhsuk-card nhsuk-card--clickable">
+      <div class="nhsuk-card__content">
+        <h2 class="nhsuk-card__heading nhsuk-u-font-size-64 nhsuk-u-margin-bottom-1">
+          <span role="text">
+            <span class="nhsuk-u-visually-hidden">Incomplete records</span> 12
+          </span>
+        </h2>
+        <a href="#" class="nhsuk-card__link nhsuk-link--no-visited-state">Procedures need completion</a>
+
+      </div>
+    </div>
+  </li>
+  <li class="nhsuk-grid-column-one-quarter nhsuk-card-group__item">
+    <div class="nhsuk-card nhsuk-card--clickable">
+      <div class="nhsuk-card__content">
+        <h2 class="nhsuk-card__heading nhsuk-u-font-size-64 nhsuk-u-margin-bottom-1">
+          <span role="text">
+            <span class="nhsuk-u-visually-hidden">Procedures added today:</span> 23
+          </span>
+        </h2>
+        <a href="#" class="nhsuk-card__link nhsuk-link--no-visited-state">Procedures added today</a>
+
+      </div>
+    </div>
+  </li>
+  <li class="nhsuk-grid-column-one-quarter nhsuk-card-group__item">
+    <div class="nhsuk-card nhsuk-card--clickable">
+      <div class="nhsuk-card__content">
+        <h2 class="nhsuk-card__heading nhsuk-u-font-size-64 nhsuk-u-margin-bottom-1">
+          <span role="text">
+            <span class="nhsuk-u-visually-hidden">Records require follow-up:</span> 8
+          </span>
+        </h2>
+        <a href="#" class="nhsuk-card__link nhsuk-link--no-visited-state">Records require follow-up</a>
+
+      </div>
+    </div>
+  </li>
+</ul>
+<h2 class="nhsuk-heading-l">Actions</h2>
+<ul class="nhsuk-grid-row nhsuk-card-group">
+  <li class="nhsuk-grid-column-one-half nhsuk-card-group__item">
+    <div class="nhsuk-card nhsuk-card--clickable nhsuk-card--primary">
+      <div class="nhsuk-card__content">
+        <h2 class="nhsuk-card__heading nhsuk-heading-m">
+          <a class="nhsuk-card__link nhsuk-link--no-visited-state" href="#">Search for a patient</a>
+        </h2>
+        <p class="nhsuk-card__description">Find a patient to add, view and change procedure and device information.</p>
+        <svg class="nhsuk-icon nhsuk-icon--chevron-right-circle" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" focusable="false" aria-hidden="true">
+          <path d="M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20Zm-.3 5.8a1 1 0 1 0-1.5 1.4l2.9 2.8-2.9 2.8a1 1 0 0 0 1.5 1.4l3.5-3.5c.4-.4.4-1 0-1.4Z" />
+        </svg>
+      </div>
+    </div>
+
+  </li>
+  <li class="nhsuk-grid-column-one-half nhsuk-card-group__item">
+    <div class="nhsuk-card nhsuk-card--clickable nhsuk-card--primary">
+      <div class="nhsuk-card__content">
+        <h2 class="nhsuk-card__heading nhsuk-heading-m">
+          <a class="nhsuk-card__link nhsuk-link--no-visited-state" href="#">Bulk upload</a>
+        </h2>
+        <p class="nhsuk-card__description">Bulk upload registry information in .CSV or .XLS formats.</p>
+        <svg class="nhsuk-icon nhsuk-icon--chevron-right-circle" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" focusable="false" aria-hidden="true">
+          <path d="M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20Zm-.3 5.8a1 1 0 1 0-1.5 1.4l2.9 2.8-2.9 2.8a1 1 0 0 0 1.5 1.4l3.5-3.5c.4-.4.4-1 0-1.4Z" />
+        </svg>
+      </div>
+    </div>
+
+  </li>
+  <li class="nhsuk-grid-column-one-half nhsuk-card-group__item">
+    <div class="nhsuk-card nhsuk-card--clickable nhsuk-card--primary">
+      <div class="nhsuk-card__content">
+        <h2 class="nhsuk-card__heading nhsuk-heading-m">
+          <a class="nhsuk-card__link nhsuk-link--no-visited-state" href="#">Reports</a>
+        </h2>
+        <p class="nhsuk-card__description">Create and download reports.</p>
+        <svg class="nhsuk-icon nhsuk-icon--chevron-right-circle" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" focusable="false" aria-hidden="true">
+          <path d="M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20Zm-.3 5.8a1 1 0 1 0-1.5 1.4l2.9 2.8-2.9 2.8a1 1 0 0 0 1.5 1.4l3.5-3.5c.4-.4.4-1 0-1.4Z" />
+        </svg>
+      </div>
+    </div>
+
+  </li>
+</ul>
+</div>
+</div>
+</div>
+{% endblock %}

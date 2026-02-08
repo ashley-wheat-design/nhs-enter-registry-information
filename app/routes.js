@@ -783,7 +783,7 @@ router.post('/record-procedure/confirmation', (req, res) => {
   // If this was launched from the patient profile, go back there.
   const journey = req.session.data.journey
   if (journey === 'addProcedure' || journey === 'singlePatientView') {
-    return res.redirect('/patient-profile/')
+    return res.redirect('/record-procedure/confirmation')
   }
 
   return res.redirect('/dashboard')

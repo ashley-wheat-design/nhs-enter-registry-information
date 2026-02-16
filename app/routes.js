@@ -219,6 +219,7 @@ router.use((req, res, next) => {
 router.get('/record-procedure', (req, res) => {
 //   delete req.session.data.nhsNumber
 //   delete req.session.data.selectedPatient
+    delete req.session.data.currentOperationDevices
   res.render('record-procedure/task-list')
 })
 
@@ -783,7 +784,7 @@ router.post('/record-procedure/confirmation', (req, res) => {
   // If this was launched from the patient profile, go back there.
   const journey = req.session.data.journey
   if (journey === 'addProcedure' || journey === 'singlePatientView') {
-    return res.redirect('/patient-profile/')
+    return res.redirect('/record-procedure/confirmation')
   }
 
   return res.redirect('/dashboard')

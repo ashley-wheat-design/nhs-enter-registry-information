@@ -47,7 +47,7 @@
 {% block content %}
 
 <div class="nhsuk-grid-row">
-  <div class="nhsuk-grid-column-two-thirds">
+  <div class="nhsuk-grid-column-three-quarters">
     <form class="form" action="/record-procedure/confirmation" method="post">
       <div class="nhsuk-form-group">
         <fieldset class="nhsuk-fieldset">
@@ -63,19 +63,48 @@
 
               <dl class="nhsuk-summary-list">
                 <div class="nhsuk-summary-list__row">
-                  <dt class="nhsuk-summary-list__key">Name</dt>
-                  <dd class="nhsuk-summary-list__value">{{ p.firstName }} {{ p.lastName }}</dd>
+                  <dt class="nhsuk-summary-list__key">First name</dt>
+                  <dd class="nhsuk-summary-list__value">{{ p.firstName }} </dd>
+                  <dd class="nhsuk-summary-list__actions">
+                    <a class="nhsuk-link nhsuk-link--no-visited-state"
+                       href="/record-procedure/clinician/clinicians-summary?returnTo={{ returnTo | urlencode }}">
+                      Change<span class="nhsuk-u-visually-hidden">First name</span>
+                    </a>
+                  </dd>
+                </div>
+
+                <div class="nhsuk-summary-list__row">
+                  <dt class="nhsuk-summary-list__key">Last name</dt>
+                  <dd class="nhsuk-summary-list__value">{{ p.lastName }}</dd>
+                  <dd class="nhsuk-summary-list__actions">
+                    <a class="nhsuk-link nhsuk-link--no-visited-state"
+                       href="/record-procedure/clinician/clinicians-summary?returnTo={{ returnTo | urlencode }}">
+                      Change<span class="nhsuk-u-visually-hidden">Last name</span>
+                    </a>
+                  </dd>
                 </div>
 
                 <div class="nhsuk-summary-list__row">
                   <dt class="nhsuk-summary-list__key">Date of birth</dt>
                   <dd class="nhsuk-summary-list__value">{{ p.dob }}</dd>
+                  <dd class="nhsuk-summary-list__actions">
+                    <a class="nhsuk-link nhsuk-link--no-visited-state"
+                       href="/record-procedure/clinician/clinicians-summary?returnTo={{ returnTo | urlencode }}">
+                      Change<span class="nhsuk-u-visually-hidden">Date of birth</span>
+                    </a>
+                  </dd>
                 </div>
 
                 <div class="nhsuk-summary-list__row">
                   <dt class="nhsuk-summary-list__key">Address</dt>
                   <dd class="nhsuk-summary-list__value">
                     {{ (p.address or []) | join('<br>') | safe }}
+                  </dd>
+                  <dd class="nhsuk-summary-list__actions">
+                    <a class="nhsuk-link nhsuk-link--no-visited-state"
+                       href="/record-procedure/clinician/clinicians-summary?returnTo={{ returnTo | urlencode }}">
+                      Change<span class="nhsuk-u-visually-hidden">Address</span>
+                    </a>
                   </dd>
                 </div>
 
@@ -84,22 +113,46 @@
                   <dd class="nhsuk-summary-list__value">
                     {% if p.emailAddress %}{{ p.emailAddress }}{% else %}Not entered{% endif %}
                   </dd>
+                  <dd class="nhsuk-summary-list__actions">
+                    <a class="nhsuk-link nhsuk-link--no-visited-state"
+                       href="/record-procedure/clinician/clinicians-summary?returnTo={{ returnTo | urlencode }}">
+                      Change<span class="nhsuk-u-visually-hidden">Email address</span>
+                    </a>
+                  </dd>
                 </div>
 
                 <div class="nhsuk-summary-list__row">
                   <dt class="nhsuk-summary-list__key">Gender</dt>
                   <dd class="nhsuk-summary-list__value">{{ p.gender }}</dd>
+                  <dd class="nhsuk-summary-list__actions">
+                    <a class="nhsuk-link nhsuk-link--no-visited-state"
+                       href="/record-procedure/clinician/clinicians-summary?returnTo={{ returnTo | urlencode }}">
+                      Change<span class="nhsuk-u-visually-hidden">Gender</span>
+                    </a>
+                  </dd>
                 </div>
 
                 <div class="nhsuk-summary-list__row">
                   <dt class="nhsuk-summary-list__key">NHS number</dt>
                   <dd class="nhsuk-summary-list__value">{{ p.nhsNumber }}</dd>
+                  <dd class="nhsuk-summary-list__actions">
+                    <a class="nhsuk-link nhsuk-link--no-visited-state"
+                       href="/record-procedure/clinician/clinicians-summary?returnTo={{ returnTo | urlencode }}">
+                      Change<span class="nhsuk-u-visually-hidden">NHS number</span>
+                    </a>
+                  </dd>
                 </div>
 
                 <div class="nhsuk-summary-list__row">
                   <dt class="nhsuk-summary-list__key">Registered GP</dt>
                   <dd class="nhsuk-summary-list__value">
                     {{ (p.registeredGp or []) | join('<br>') | safe }}
+                  </dd>
+                  <dd class="nhsuk-summary-list__actions">
+                    <a class="nhsuk-link nhsuk-link--no-visited-state"
+                       href="/record-procedure/clinician/clinicians-summary?returnTo={{ returnTo | urlencode }}">
+                      Change<span class="nhsuk-u-visually-hidden">Registered GP</span>
+                    </a>
                   </dd>
                 </div>
 
@@ -108,12 +161,24 @@
                   <dd class="nhsuk-summary-list__value">
                     {% if p.heightCm %}{{ p.heightCm }} cm{% else %}Not entered{% endif %}
                   </dd>
+                  <dd class="nhsuk-summary-list__actions">
+                    <a class="nhsuk-link nhsuk-link--no-visited-state"
+                       href="/record-procedure/clinician/clinicians-summary?returnTo={{ returnTo | urlencode }}">
+                      Change<span class="nhsuk-u-visually-hidden">Height</span>
+                    </a>
+                  </dd>
                 </div>
 
                 <div class="nhsuk-summary-list__row">
                   <dt class="nhsuk-summary-list__key">Weight</dt>
                   <dd class="nhsuk-summary-list__value">
                     {% if p.weightKg %}{{ p.weightKg }} kg{% else %}Not entered{% endif %}
+                  </dd>
+                  <dd class="nhsuk-summary-list__actions">
+                    <a class="nhsuk-link nhsuk-link--no-visited-state"
+                       href="/record-procedure/clinician/clinicians-summary?returnTo={{ returnTo | urlencode }}">
+                      Change<span class="nhsuk-u-visually-hidden">Weight</span>
+                    </a>
                   </dd>
                 </div>
               </dl>
@@ -129,6 +194,12 @@
                   <dt class="nhsuk-summary-list__key">Procedure date</dt>
                   <dd class="nhsuk-summary-list__value">
                     {% if procDate %}{{ procDate }}{% else %}—{% endif %}
+                  </dd>
+                  <dd class="nhsuk-summary-list__actions">
+                    <a class="nhsuk-link nhsuk-link--no-visited-state"
+                       href="/record-procedure/clinician/clinicians-summary?returnTo={{ returnTo | urlencode }}">
+                      Change<span class="nhsuk-u-visually-hidden">Procedure date</span>
+                    </a>
                   </dd>
                 </div>
 
@@ -148,6 +219,12 @@
                       —
                     {% endif %}
                   </dd>
+                  <dd class="nhsuk-summary-list__actions">
+                    <a class="nhsuk-link nhsuk-link--no-visited-state"
+                       href="/record-procedure/clinician/clinicians-summary?returnTo={{ returnTo | urlencode }}">
+                      Change<span class="nhsuk-u-visually-hidden">Primary diagnosis</span>
+                    </a>
+                  </dd>
                 </div>
 
                 {% if additionalCodes.length %}
@@ -160,6 +237,12 @@
                     </div>
                     {% endfor %}
                   </dd>
+                  <dd class="nhsuk-summary-list__actions">
+                    <a class="nhsuk-link nhsuk-link--no-visited-state"
+                       href="/record-procedure/clinician/clinicians-summary?returnTo={{ returnTo | urlencode }}">
+                      Change<span class="nhsuk-u-visually-hidden">Additional diagnoses</span>
+                    </a>
+                  </dd>
                 </div>
                 {% endif %}
 
@@ -171,6 +254,12 @@
                     {% else %}
                       —
                     {% endif %}
+                  </dd>
+                  <dd class="nhsuk-summary-list__actions">
+                    <a class="nhsuk-link nhsuk-link--no-visited-state"
+                       href="/record-procedure/clinician/clinicians-summary?returnTo={{ returnTo | urlencode }}">
+                      Change<span class="nhsuk-u-visually-hidden">ASA physical status</span>
+                    </a>
                   </dd>
                 </div>
 
@@ -194,6 +283,12 @@
                       —
                     {% endif %}
                   </dd>
+                  <dd class="nhsuk-summary-list__actions">
+                    <a class="nhsuk-link nhsuk-link--no-visited-state"
+                       href="/record-procedure/clinician/clinicians-summary?returnTo={{ returnTo | urlencode }}">
+                      Change<span class="nhsuk-u-visually-hidden">Operation outcome</span>
+                    </a>
+                  </dd>
                 </div>
 
                 <div class="nhsuk-summary-list__row">
@@ -208,6 +303,12 @@
                     {% else %}—
                     {% endif %}
                   </dd>
+                  <dd class="nhsuk-summary-list__actions">
+                    <a class="nhsuk-link nhsuk-link--no-visited-state"
+                       href="/record-procedure/clinician/clinicians-summary?returnTo={{ returnTo | urlencode }}">
+                      Change<span class="nhsuk-u-visually-hidden">Anatomical side</span>
+                    </a>
+                  </dd>
                 </div>
               </dl>
             </div>
@@ -215,9 +316,22 @@
 
           <div class="nhsuk-card">
             <div class="nhsuk-card__content">
-              <h3 class="nhsuk-card__heading">
-                Devices ({{ devicesAdded.length }})
-              </h3>
+
+              <div class="nhsuk-grid-row nhsuk-u-margin-bottom-3">
+  <div class="nhsuk-grid-column-one-half">
+    <h3 class="nhsuk-card__heading nhsuk-u-margin-bottom-0">
+      Devices ({{ devicesAdded.length }})
+    </h3>
+  </div>
+
+  <div class="nhsuk-grid-column-one-half nhsuk-u-text-align-right">
+    <a class="nhsuk-link nhsuk-link--no-visited-state nhsuk-body"
+       href="">
+      Change devices
+    </a>
+  </div>
+</div>
+
 
               {% if devicesAdded.length %}
                 {% for d in devicesAdded %}
@@ -266,9 +380,22 @@
 
           <div class="nhsuk-card">
             <div class="nhsuk-card__content">
-              <h3 class="nhsuk-card__heading">
-                Clinician details
-              </h3>
+
+              <div class="nhsuk-grid-row nhsuk-u-margin-bottom-3">
+  <div class="nhsuk-grid-column-one-half">
+    <h3 class="nhsuk-card__heading nhsuk-u-margin-bottom-0">
+      Clinician details
+    </h3>
+  </div>
+
+  <div class="nhsuk-grid-column-one-half nhsuk-u-text-align-right nhsuk-body">
+    <a class="nhsuk-link nhsuk-link--no-visited-state"
+       href="/record-procedure/clinician/clinicians-summary?returnTo={{ returnTo | urlencode }}">
+      Change clinicians
+    </a>
+  </div>
+</div>
+
 
               <dl class="nhsuk-summary-list nhsuk-summary-list--no-border">
 
@@ -284,9 +411,6 @@
                       —
                     {% endif %}
                   </dd>
-                  <!-- <dd class="nhsuk-summary-list__actions">
-                    <a class="nhsuk-link" href="/record-procedure/clinician/clinicians-summary">Change<span class="nhsuk-u-visually-hidden"> operation responsible consultant</span></a>
-                  </dd> -->
                 </div>
 
                 <div class="nhsuk-summary-list__row">
@@ -301,9 +425,6 @@
                       —
                     {% endif %}
                   </dd>
-                  <!-- <dd class="nhsuk-summary-list__actions">
-                    <a class="nhsuk-link" href="/record-procedure/clinician/clinicians-summary">Change<span class="nhsuk-u-visually-hidden"> operation supervising surgeon</span></a>
-                  </dd> -->
                 </div>
 
                 <div class="nhsuk-summary-list__row">
@@ -324,9 +445,6 @@
                       —
                     {% endif %}
                   </dd>
-                  <!-- <dd class="nhsuk-summary-list__actions">
-                    <a class="nhsuk-link" href="/record-procedure/clinician/clinicians-summary">Change<span class="nhsuk-u-visually-hidden"> operation lead surgeons</span></a>
-                  </dd> -->
                 </div>
 
               </dl>
@@ -339,6 +457,7 @@
       <button class="nhsuk-button" data-module="nhsuk-button" type="submit">
         Confirm and submit
       </button>
+      <a href="task-list" class="nhsuk-u-margin-left-2 nhsuk-button nhsuk-button--secondary">Return to task list</a>
     </form>
   </div>
 </div>
